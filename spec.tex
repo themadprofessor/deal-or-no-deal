@@ -1,11 +1,21 @@
 \documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetheme{Bergen}
+\usecolortheme{default}
+
+\title{Deal or No Deal}
+\subtitle{Design Specification}
+\author{Alexander Taylor \and Stuart Reilly \and Krisana Tunprasert \and Alexander Anderson}
+\date{\today}
 
 \begin{document}
 
-\title{Deal or No Deal Design Specification}
-\subtitle{Design Specification}
-\author{Alexander Taylor \and Stuart Reilly \and Krisana Tunprasert \and Alexander Anderson}
-
 \frame{\titlepage}
+
+\begin{frame}
+	\frametitle{System Architecture Diagram}
+	\resizebox{\textwidth}{!}{\input{sysArch.tex}}
+\end{frame}
 
 \end{document}
