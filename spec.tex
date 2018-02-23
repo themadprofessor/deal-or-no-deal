@@ -7,12 +7,17 @@
 
 \title{Deal or No Deal}
 \subtitle{Design Specification}
-\author{Alexander Taylor \and Stuart Reilly \and Krisana Tunprasert \and Alexander Anderson}
+\author{Alexander Taylor - 2247116 \and Stuart Reilly - 2258082 \and Krisana Tunprasert - 2193578\and Alexander Anderson - 2079103}
 \date{\today}
 
 \begin{document}
 
 \frame{\titlepage}
+
+\begin{frame}
+	\frametitle{Overview}
+	The aim of our website is to crowdsource all the best deals that are available in order for people to save money and to promote spending. Our website will allow anyone to register for an account and either post their deals with URLs to the corresponding website, upload details of any ongoing locals deals or view the deals themselves. Users will be able to either ‘upvote’ or ‘downvote’ the deal, as an indication of its authenticity as well as have an open discussion about the deal through a comment system. The site will also allow users to search for deals either based on a category(s) that the deal falls into, by creation date to see the most recently uploaded deals or by the most popular deal indicated by the amount of ‘upvotes’ it has.
+\end{frame}
 
 \begin{frame}
 	\frametitle{Requirements}
@@ -33,6 +38,70 @@
 \begin{frame}
 	\frametitle{System Architecture Diagram}
 	\resizebox{\textwidth}{!}{\input{sysArch.tex}}
+\end{frame}
+
+\begin{frame}
+	\frametitle{User Persona - John Smith}
+	\begin{center}
+		\includegraphics[height=.3\textheight]{persona/john.png}
+	\end{center}
+	John is a 20 year old art student at the university of Glasgow. While he likes to go out and buy many things he is an art student and so can’t afford to as he drinks a lot. Due to this he has adopted a policy of only buying items that have some sort of deal attached to them. He also likes to share deals that he has found with his friends and family. Through the web app he will be able to share deals with a large range of people as he will be able to upload deals that he finds. 
+\end{frame}
+
+\begin{frame}
+	\frametitle{User Persona - Max Simmons}
+	\begin{center}
+		\includegraphics[height=.3\textheight]{persona/max.png}
+	\end{center}
+	Max is a 19 year old computer science student at Glasgow university.  He is quite well off and so he generally doesn’t care too much about money but he cannot resist a good deal. While he does like a good deal he doesn't like others getting to deals before him and will go as far to not telling others about brilliant deals. Through our web app he will be able to look at deals that other people find and also be able to upvote them if he believes that they are a good deal.
+\end{frame}
+
+\begin{frame}
+	\frametitle{ER Diagram}
+	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{er-dia}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Database Data Types - User}
+	\begin{itemize}
+		\item user\_ID (VARVCHAR) – the unique identifier for each registered user.
+		\item Firstname/surname (VARCHAR) – the first and last name of the user.
+		\item Email (VARCHAR) – the users email address.
+		\item Total\_upvotes (INT) – the total number of upvotes that user has accumulated from all their posts.
+		\item Posts\-made(INT) – the total number of posts the user has made.
+		\item Is\_admin (BOOLEAN) – the status of the user (if they are an admin or not).
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Database Data Types - Thread}
+	\begin{itemize}
+		\item Thread\_ID (VARCHAR) – the unique identifier of the thread.
+		\item Thread\_name (VARCHAR) – the name of the thread.
+		\item Thread\_Content (VARCHAR) – the content that the poster uploads (i.e. the deal).
+		\item Reply\_count (INT) – the number of replies the thread has.
+		\item Date\_created (INT) – the date when the thread was created.
+		\item Upvotes (INT) – the number of upvotes the thread has.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Database Data Types - Category}
+	\begin{itemize}
+		\item Category\_ID (VARCHAR) – the unique identifier of the category.
+		\item Category\_name (VARCHAR) – the name of the category.
+		\item Thread\_count (INT) – the number of threads within the category.
+		\item Category\_description (VARCHAR) – a description of what the category is.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Databse Data Types - Comment}
+	\begin{itemize}
+		\item Comment\_ID – the unique identifier for each comment.
+		\item Date\_created (INT) – the date in which the comment was created.
+		\item Comment\_content (VARCHAR) – the comment left itself.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
