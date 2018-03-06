@@ -24,7 +24,7 @@ class Category(models.Model):
 
 
 class User(models.Model):
-    user_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     first_name = models.CharField("First Name", max_length=30)
     last_name = models.CharField("Last Name", max_length=30)
     email = models.CharField("Email", max_length=128)
@@ -36,7 +36,7 @@ class User(models.Model):
 
 
 class Deal(models.Model):
-    deal_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
