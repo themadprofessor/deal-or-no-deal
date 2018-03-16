@@ -26,22 +26,25 @@ body {
 }
 
 .nav-strip-bar li a {
-	display: block;
 	color: white;
 	font-size: 15pt;
 	display: inline-block;
-	padding: 14px 16px;
+	padding: 0.5em 16px;
 	text-decoration: none;
+    text-align: center;
 }
 
 .nav-strip-bar li a:hover {
 	background-color: #111;
-	padding: 14px 16px;
+}
+
+#other a {
+    padding: 0.9em 16px;
 }
 
 #other a:hover {
 	background-color: #111;
-	padding: 18px 16px;
+    padding: 0.9em 16px;
 }
 
 .nav-strip-bar li a.active {
