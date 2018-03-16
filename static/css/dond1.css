@@ -42,7 +42,7 @@ body {
     padding: 0.9em 16px;
 }
 
-#other a:hover {
+.other a:hover {
 	background-color: #111;
     padding: 0.9em 16px;
 }
@@ -78,6 +78,22 @@ body {
 	background: #ccc;
 }
 
+
+/* css for the login button */
+.login-button {
+	display: block;
+    border: none;
+    background-color: #333;
+    padding: 14px 28px;
+    font-size: 17px;
+    cursor: pointer;
+    text-align: center;
+    color: white;
+}
+
+.login-button:hover {
+	background-color: #111;
+}
 
 /* css for filter buttons */
 
@@ -149,11 +165,12 @@ h1 {
 }
 
 .model-content {
-    background-color: #fefefe;
+    background-color: #333;
     margin: 15% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
+    color: white;
 }
 
 #login-model input[type=text], input[type=password] {
@@ -175,7 +192,11 @@ h1 {
     width: 100%;
 }
 
+#login-model button:hover {
+	opacity: 0.75;
+}
+
 span.psw {
 	float: right;
-    padding-top: 16px;
+    padding-top: 24px;
 }
