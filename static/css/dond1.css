@@ -52,18 +52,18 @@ body {
 	color: white;
 }
 
-.nav-strip-bar .search-container {
+.search-container {
 	float: right;
 }
 
-.nav-strip-bar input[type=text] {
+.search-container input[type=text] {
 	padding: 6px;
 	margin-top: 12px;
 	font-size: 17px;
 	border: none;
 }
 
-.nav-strip-bar .search-container button {
+.search-container button {
 	float: right;
 	padding: 6px 10px;
 	margin-top: 12px;
@@ -74,7 +74,7 @@ body {
 	cursor: pointer;
 }
 
-.nav-strip-bar .search-container button:hover {
+.search-container button:hover {
 	background: #ccc;
 }
 
