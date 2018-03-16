@@ -57,12 +57,14 @@
     <script type="application/javascript">
         function open_login() {
             var model = document.getElementById("login-model");
-            model.style.display = "block";
+            model.style.zIndex = "1";
+            model.style.opacity = "1";
         }
 
         function close_login() {
             var model = document.getElementById("login-model");
-            model.style.display = "none";
+            model.style.zIndex = "-999";
+            model.style.opacity = "0";
         }
     </script>
 	</body>
