@@ -10,23 +10,60 @@
 			{% block title_block %}
 			{% endblock %}
 		</title>
-			<ul class="nav-strip-bar">
-				<li><a href="/dondapp/" class="active" id="home-link">STUDENT DEALS</a></li>
-				<li id="other"><a href="/dondapp/category">Category</a></li>
-				<li id="other"><a href="/dondapp/about">About</a></li>
-				<li id="other" style="float:right"><a href="/dondapp/login">Login</a></li>
-				<div class="search-container">
-					<form action="/action_page.php">
-						<li><input type="text" placeholder="Search..." name="search"></li>
-						<li><button type="submit"><i class="fa fa-search"></i></button></li>
-					</form>
-				</div>
-			</ul>
-	</head>
-	<body>
-		<div>
-			{% block body_block %}
-			{% endblock %}
-		</div>
+
+    </head>
+    <body>
+    <nav>
+        <ul class="nav-strip-bar">
+            <li><a href="/dondapp/" class="active" id="home-link">STUDENT DEALS</a></li>
+            <li id="other"><a href="/dondapp/category">Category</a></li>
+            <li id="other"><a href="/dondapp/about">About</a></li>
+            <li id="other" style="float:right"><button onclick="open_login()">Login</button></li>
+            <div class="search-container">
+                <form action="/action_page.php">
+                    <li><input type="text" placeholder="Search..." name="search"></li>
+                    <li><button type="submit"><i class="fa fa-search"></i></button></li>
+                </form>
+            </div>
+        </ul>
+    </nav>
+    <div>
+        {% block body_block %}
+        {% endblock %}
+    </div>
+
+    <div id="login-model" class="model">
+    <form class="model-content">
+        <div class="container">
+            <label for="username"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="username" required>
+
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="password" required>
+
+            <button type="submit">Login</button>
+            <label>
+                <input type="checkbox" checked="checked" name="remember"> Remember Me
+            </label>
+        </div>
+
+        <div class="container" style="background-color:#f1f1f1">
+            <button type="button" class="cancelbtn" onclick="close_login()">Cancel</button>
+            <span class="psw">Forgot <a href="#">password?</a></span>
+        </div>
+    </form>
+    </div>
+
+    <script type="application/javascript">
+        function open_login() {
+            var model = document.getElementById("login-model");
+            model.style.display = "block";
+        }
+
+        function close_login() {
+            var model = document.getElementById("login-model");
+            model.style.display = "none";
+        }
+    </script>
 	</body>
 </html>
