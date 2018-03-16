@@ -41,7 +41,7 @@ class Deal(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     description = models.TextField()
-    price = models.IntegerField(default=0)
+    price = models.FloatField(default=0.0)
     creation_date = models.DateTimeField(default=timezone.now)
     upvotes = models.IntegerField(default=0)
     downvotes = models.IntegerField(default=0)
