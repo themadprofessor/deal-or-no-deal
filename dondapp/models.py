@@ -90,6 +90,10 @@ class User(AbstractUser):
     def is_staff(self):
         return self.authority
 
+    @property
+    def is_superuser(self):
+        return self.authority
+
 
 class Deal(models.Model):
     id = models.AutoField(primary_key=True)
