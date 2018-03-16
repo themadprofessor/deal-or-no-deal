@@ -19,7 +19,23 @@
             <li><a href="{% url 'home' %}" class="active" id="home-link">STUDENT DEALS</a></li>
             <li id="other"><a href="{% url 'category' %}">Category</a></li>
             <li id="other"><a href="{% url 'about' %}">About</a></li>
-            <li style="float:right"><button onclick="open_login()" class="login-button">Login</button></li>
+            <li style="float:right">
+                {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown button
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+{#                    <button onclick="{% url 'logout' %}" class="login-button">Logout</button>#}
+                {% else %}
+                    <button onclick="open_login()" class="login-button">Login</button>
+                {% endif %}
+            </li>
             <div class="search-container">
                 <form action="/action_page.php">
                     <li><input type="text" placeholder="Search..." name="search"></li>
@@ -34,7 +50,8 @@
     </div>
 
     <div id="login-model" class="model">
-    <form class="model-content">
+    <form class="model-content" action="{% url 'login' %}", method="post">
+        {% csrf_token %}
         <div class="container">
             <label for="username"><b>Username</b></label>
             <input type="text" placeholder="Enter Username" name="username" required>
