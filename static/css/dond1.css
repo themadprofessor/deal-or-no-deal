@@ -80,6 +80,7 @@ body {
 
 
 /* css for the login button */
+
 .login-button {
 	display: block;
     border: none;
@@ -94,6 +95,7 @@ body {
 .login-button:hover {
 	background-color: #111;
 }
+
 
 /* css for filter buttons */
 
@@ -147,8 +149,8 @@ h1 {
 }
 
 
-
 /* css for the login form */
+
 .model {
     display: block; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -199,4 +201,13 @@ h1 {
 span.psw {
 	float: right;
     padding-top: 24px;
+}
+
+
+/* css for the deal cards */
+
+.deal-card {
+	margin: 1% auto;
+	width: 95%;
+	
 }
