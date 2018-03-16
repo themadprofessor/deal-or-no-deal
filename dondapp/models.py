@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
 
 
 # Create your models here.
@@ -23,13 +24,18 @@ class Category(models.Model):
         return self.name
 
 
-class User(models.Model):
+class User(AbstractUser):
     id = models.AutoField(primary_key=True)
     first_name = models.CharField("First Name", max_length=30)
     last_name = models.CharField("Last Name", max_length=30)
     email = models.CharField("Email", max_length=128)
     likes = models.IntegerField("Number of likes", default=0)
     authority = models.BooleanField(default=False)
+
+    # Unique ID used by Django
+    USERNAME_FIELD = "id"
+    EMAIL_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name", "email"]
 
     def __str__(self):
         return self.first_name + " " + self.last_name

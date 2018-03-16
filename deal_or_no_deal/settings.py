@@ -21,6 +21,8 @@ MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
+AUTH_USER_MODEL = 'dondapp.User'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 's@xx&^6xp=c8r=@riy_#vop@sso=mwj_g=05=1i&*^3mx-e#=#'
 
