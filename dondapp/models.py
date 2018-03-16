@@ -3,6 +3,7 @@ from django.utils import timezone
 
 
 # Create your models here.
+<<<<<<< Updated upstream
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     deal_id = models.ForeignKey('Deal', on_delete=models.CASCADE)
@@ -48,3 +49,7 @@ class Deal(models.Model):
 
     def __str__(self):
         return self.title
+=======
+
+
+>>>>>>> Stashed changes
