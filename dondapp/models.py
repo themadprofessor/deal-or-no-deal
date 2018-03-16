@@ -1,6 +1,50 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, username, first_name, last_name, email, password=None, likes=0, authority=False):
+        if not email:
+            raise ValueError("Users must have an email address")
+        if not first_name:
+            raise ValueError("Users must have a first name")
+        if not last_name:
+            raise ValueError("Users must have a last name")
+
+        user = self.model(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            likes=likes,
+            authority=False
+        )
+
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
+
+    def create_superuser(self, username, first_name, last_name, email, password=None, likes=0, authority=False):
+        if not email:
+            raise ValueError("Superusers must have an email address")
+        if not first_name:
+            raise ValueError("Superusers must have a first name")
+        if not last_name:
+            raise ValueError("Superusers must have a last name")
+
+        user = self.model(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            likes=likes,
+            authority=True
+        )
+
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
 
 
 # Create your models here.
@@ -25,20 +69,26 @@ class Category(models.Model):
 
 
 class User(AbstractUser):
-    id = models.AutoField(primary_key=True)
+    username = models.CharField("Username", max_length=128, primary_key=True)
+    email = models.CharField("Email", max_length=128)
     first_name = models.CharField("First Name", max_length=30)
     last_name = models.CharField("Last Name", max_length=30)
-    email = models.CharField("Email", max_length=128)
     likes = models.IntegerField("Number of likes", default=0)
     authority = models.BooleanField(default=False)
 
     # Unique ID used by Django
-    USERNAME_FIELD = "id"
+    USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "email"]
 
+    objects = UserManager()
+
     def __str__(self):
         return self.first_name + " " + self.last_name
+
+    @property
+    def is_staff(self):
+        return self.authority
 
 
 class Deal(models.Model):
@@ -54,3 +104,5 @@ class Deal(models.Model):
 
     def __str__(self):
         return self.title
+
+
