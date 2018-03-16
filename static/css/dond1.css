@@ -1,0 +1,132 @@
+body {
+	margin: 0;
+	background-color: grey;
+	font-family: Arial, Helevetica, sans-serif;
+}
+
+
+/* css for the navigation bar */
+
+#home-link {
+	font-size: 20pt;
+}
+
+.nav-strip-bar {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+	top: 0;
+	width: 100%;
+}
+
+.nav-strip-bar li {
+	float: left;
+}
+
+.nav-strip-bar li a {
+	display: block;
+	color: white;
+	font-size: 15pt;
+	display: inline-block;
+	padding: 14px 16px;
+	text-decoration: none;
+}
+
+.nav-strip-bar li a:hover {
+	background-color: #111;
+	padding: 14px 16px;
+}
+
+#other a:hover {
+	background-color: #111;
+	padding: 18px 16px;
+}
+
+.nav-strip-bar li a.active {
+	background-color: #4CAF50;
+	color: white;
+}
+
+.nav-strip-bar .search-container {
+	float: right;
+}
+
+.nav-strip-bar input[type=text] {
+	padding: 6px;
+	margin-top: 12px;
+	font-size: 17px;
+	border: none;
+}
+
+.nav-strip-bar .search-container button {
+	float: right;
+	padding: 6px 10px;
+	margin-top: 12px;
+	margin-right: 16px;
+	background: #ddd;
+	font-size: 17px;
+	border: none;
+	cursor: pointer;
+}
+
+.nav-strip-bar .search-container button:hover {
+	background: #ccc;
+}
+
+
+/* css for filter buttons */
+
+ul.filter-strip {
+	background-color: white;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	width: 100%;
+}
+
+.filters {
+	border: none;
+	padding: 10px 31px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 11px;
+	float: left;
+}
+
+.filters:hover {
+	background-color: #111;
+	background-size: auto;
+	border: 4px solid;
+	border-radius: 12px;
+	color: white;
+}
+
+#active {
+	background-color: #4CAF50;
+	color: white;
+	border: 4px solid;
+	border-radius: 12px;
+}
+
+button:focus{
+	outline: 0;
+}
+
+
+/* css for the about page text */
+
+h1 {
+	text-align: center;
+}
+
+.about-text {
+	font-size: 18px;
+	text-align: center;
+}
+
+
+
+/* css for the login form */

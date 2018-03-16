@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/static/css/dond1.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<title>
+			Deal or No Deal -
+			{% block title_block %}
+			{% endblock %}
+		</title>
+			<ul class="nav-strip-bar">
+				<li><a href="/dondapp/" class="active" id="home-link">STUDENT DEALS</a></li>
+				<li id="other"><a href="/dondapp/category">Category</a></li>
+				<li id="other"><a href="/dondapp/about">About</a></li>
+				<li id="other" style="float:right"><a href="/dondapp/login">Login</a></li>
+				<div class="search-container">
+					<form action="/action_page.php">
+						<li><input type="text" placeholder="Search..." name="search"></li>
+						<li><button type="submit"><i class="fa fa-search"></i></button></li>
+					</form>
+				</div>
+			</ul>
+	</head>
+	<body>
+		<div>
+			{% block body_block %}
+			{% endblock %}
+		</div>
+	</body>
+</html>

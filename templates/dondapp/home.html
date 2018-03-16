@@ -1,0 +1,18 @@
+{% extends 'dondapp/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+	Home
+{% endblock %}
+
+{% block body_block %}
+	<ul class="filter-strip">
+		<button class="filters" id="active" >Best</li>
+		<button class="filters">Top</li>
+		<button class="filters">New</li>
+	</ul>
+
+	<div>
+		This is the home page. <br />
+	</div>
+{% endblock %}
