@@ -6,3 +6,4 @@ admin.site.register(User)
 admin.site.register(Deal)
 admin.site.register(Category)
 admin.site.register(Comment)
+
