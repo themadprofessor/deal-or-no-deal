@@ -17,9 +17,9 @@
     <nav>
         <ul class="nav-strip-bar">
             <li><a href="/dondapp/" class="active" id="home-link">STUDENT DEALS</a></li>
-            <li id="other"><a href="/dondapp/category">Category</a></li>
-            <li id="other"><a href="/dondapp/about">About</a></li>
-            <li id="other" style="float:right"><button onclick="open_login()">Login</button></li>
+            <li class="other"><a href="/dondapp/category">Category</a></li>
+            <li class="other"><a href="/dondapp/about">About</a></li>
+            <li style="float:right"><button onclick="open_login()" class="login-button">Login</button></li>
             <div class="search-container">
                 <form action="/action_page.php">
                     <li><input type="text" placeholder="Search..." name="search"></li>
@@ -48,7 +48,7 @@
             </label>
         </div>
 
-        <div class="container" style="background-color:#f1f1f1">
+        <div class="container" style="background-color:#3e4042">
             <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:8em"onclick="close_login()">Cancel</button>
             <span class="psw">Forgot <a href="#">password?</a></span>
         </div>
