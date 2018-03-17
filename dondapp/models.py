@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -58,6 +60,15 @@ class Comment(models.Model):
     def __str__(self):
         return self.content
 
+    def to_json(self):
+        return json.dumps({
+            'id': self.id,
+            'deal_id': self.deal_id,
+            'user_id': self.user_id,
+            'creation_date': self.creation_date,
+            'content': self.content
+        })
+
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
@@ -66,6 +77,13 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_json(self):
+        return json.dumps({
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
+        })
 
 
 class User(AbstractUser):
@@ -94,6 +112,15 @@ class User(AbstractUser):
     def is_superuser(self):
         return self.authority
 
+    def to_json(self):
+        return json.dumps({
+            'username': self.username,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'like': self.authority
+        })
+
 
 class Deal(models.Model):
     id = models.AutoField(primary_key=True)
@@ -109,4 +136,15 @@ class Deal(models.Model):
     def __str__(self):
         return self.title
 
-
+    def to_json(self):
+        return json.dumps({
+            'id': self.id,
+            'category_id': self.category_id,
+            'user_id': self.user_id,
+            'title': self.title,
+            'description': self.description,
+            'price': self.price,
+            'creation_date': self.creation_date,
+            'upvotes': self.upvotes,
+            'downvotes': self.downvotes
+        })
