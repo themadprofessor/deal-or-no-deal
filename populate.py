@@ -6,6 +6,7 @@ import django
 django.setup()
 from dondapp.models import *
 import random as RNG
+from django.utils import timezone
 
 def populate():
     categories = [ "Food", "Fashion", "Travel", "Electronics", "Accommodation",
@@ -27,19 +28,25 @@ def populate():
               {"title":"iPhone X", "desc":"Apple Genius here, just wanted to inform you guys of the LATEST deals we have at the Apple Store, drop by to pick up your iPhone X now!!!", "category":"Electronics",
                "price":99999.99, "up":RNG.randint(1,100), "down":RNG.randint(1,33)}
               ]
-    comments = [ {"userid":0, "dealid":0, "desc":"haHAA"},
-                 {"userid":1, "dealid":1, "desc":"lMAO"},
-                 {"userid":2, "dealid":2, "desc":"eyyyyyy"},
-                 {"userid":3, "dealid":2, "desc":"goodshit"}]
-    print(usernames)
+    comments = [ {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"haHAA"},
+                 {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"lMAO"},
+                 {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"eyyyyyy"},
+                 {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"goodshit"},
+                 {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"w0w"},
+                 {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"u find good deal"},
+                 {"userid":RNG.randint(1,len(deals)), "dealid":RNG.randint(1,len(deals)), "desc":"can u pm me some mcdonald coupons?"},
+                 ]
+    #print(usernames)
     for cat_name in categories:
         add_cat(cat_name)
     for user in users:
         add_user(user["fname"].lower()+user["lname"].lower(), user["fname"], user["lname"], user["email"], user["likes"], user["auth"])
-    #for deal in deals:
-    #    add_deals(deal["title"], deal["desc"], categories.index(deal["category"]), usernames[0], deal["price"], deal["up"], deal["down"])
-    #for comment in comments:
-    #    add_comments(comment["userid"], comment["dealid"], comment["desc"])
+    #print(Category.objects.get(name="Food"))
+    #print(timezone.now())
+    for deal in deals:
+        add_deals(deal["title"], deal["desc"], Category.objects.get(name=deal["category"]), User.objects.get(first_name="Jason"), deal["price"], deal["up"], deal["down"])
+    for comment in comments:
+        add_comments(User.objects.get(username=usernames[comment["userid"]]), Deal.objects.get(id=comment["dealid"]), comment["desc"])
     
 
 def add_cat(name):
@@ -48,18 +55,18 @@ def add_cat(name):
     return c
     
 def add_user(uname,fname,lname,email,likes,auth):
-    u = User.objects.get_or_create(username=uname,email=email,first_name=fname,last_name=lname,
-                                   likes=likes,authority=auth,password="abc")
+    u = User.objects.create_user(username=uname,email=email,first_name=fname,last_name=lname,
+                                   likes=likes,authority=auth,password="abcdefghijkl")
     u.save()
     return u
 
 def add_deals(title,desc, catid, uname, price, up, down):
-    d = Deal.objects.get_or_create(category_id=catid,user_id=uname,title=title, description=desc, price=price, upvotes=up, downvotes=down)
+    d = Deal.objects.get_or_create(category_id=catid,user_id=uname,title=title, description=desc, price=price, upvotes=up, downvotes=down, creation_date=timezone.now())[0]
     d.save()
     return d
 
-def add_comments(dealid,userid,content):
-    c = Comment.objects.get_or_create(deal_id=dealid, user_id=userid, content=content)
+def add_comments(userid,dealid,content):
+    c = Comment.objects.get_or_create(deal_id=dealid, user_id=userid, content=content, creation_date=timezone.now())[0]
     c.save()
     return c
     
