@@ -61,13 +61,16 @@ class Comment(models.Model):
         return self.content
 
     def to_json(self):
-        return json.dumps({
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        return {
             'id': self.id,
             'deal_id': self.deal_id,
             'user_id': self.user_id,
             'creation_date': self.creation_date,
             'content': self.content
-        })
+        }
 
 
 class Category(models.Model):
@@ -88,11 +91,7 @@ class Category(models.Model):
         }
 
     def to_json(self):
-        return json.dumps({
-            'id': self.id,
-            'name': self.name,
-            'description': self.description
-        })
+        return json.dumps(self.to_dict())
 
 
 class User(AbstractUser):
@@ -122,13 +121,16 @@ class User(AbstractUser):
         return self.authority
 
     def to_json(self):
-        return json.dumps({
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        return {
             'username': self.username,
             'email': self.email,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'like': self.authority
-        })
+        }
 
 
 class Deal(models.Model):
@@ -146,17 +148,7 @@ class Deal(models.Model):
         return self.title
 
     def to_json(self):
-        return json.dumps({
-            'id': self.id,
-            'category_id': self.category_id,
-            'user_id': self.user_id,
-            'title': self.title,
-            'description': self.description,
-            'price': self.price,
-            'creation_date': self.creation_date,
-            'upvotes': self.upvotes,
-            'downvotes': self.downvotes
-        })
+        return json.dumps(self.to_dict())
 
     def to_dict(self):
         return {
