@@ -28,6 +28,10 @@ class CategoryView(Resource):
     def get(self, request):
         return render(request, 'dondapp/about.html')
 
+class FailedView(Resource):
+    def get(self, request):
+        return render(request, 'dondapp/failed.html')
+
 
 class LoginView(Resource):
     """View for handling login requests"""
