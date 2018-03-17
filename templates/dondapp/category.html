@@ -2,18 +2,15 @@
 {% load staticfiles %}
 
 {% block title_block %}
-	Category
+    Category
 {% endblock %}
 
 {% block body_block %}
-	<ul id="cat_list" class="filter-strip">
-	</ul>
+    <ul id="cat_list" class="filter-strip">
+    </ul>
 
-	<div class="container">
-        <div id="deal_deck" class="card-deck">
-
-        </div>
-	</div>
+    <div id='deals' class="container">
+    </div>
 
     <script type="application/javascript">
         $(document).ready(function () {
@@ -37,26 +34,109 @@
             $.ajax({
                 url: {% url 'cat_all' %} + cat_id + "/deals"
             }).done(function (response) {
-                var deck = document.getElementById('deal_deck');
-                deck.innerHTML = ""; //Clear previous deals from screen
+                var deals = $('#deals');
+                deals.html('');
                 for (var i = 0; i < response.length; i++) {
-                    var card = document.createElement("div");
-                    var card_body = document.createElement("div");
-                    var title = document.createElement("h5");
-                    var description = document.createElement("p");
-                    card.className += ' card';
-                    card_body.className += ' card-body';
-                    title.className += " card-title";
-                    description.className += " card-text";
+                    /* Produces the following:
+                    * <div class="card-deck>
+                    *     <div class="card">
+                    *         <div class="row">
+                    *             <div class="col-sm-1">
+                    *                 <div class="row">
+                    *                     <p>upvotes</p>
+                    *                 </div>
+                    *                 <div class="row">
+                    *                     <button class="vote_buttons btn btn-light">up-arrow</button>
+                    *                 </div>
+                    *                 <div class="row">
+                    *                     <button class="vote_buttons btn btn-light">down-arrow</button>
+                    *                 </div>
+                    *                 <div class="row">
+                    *                     <p>downvotes</p>
+                    *                 </div>
+                    *             </div>
+                    *             <div class="col">
+                    *                 <div class="card-body">
+                    *                     <h5>title</h5>
+                    *                     <p>description</p>
+                    *                 </div>
+                    *             </div>
+                    *         </div>
+                    *     </div>
+                    * </div>
+                    * */
 
-                    title.innerText = response[i].title;
-                    description.innerText = response[i].description;
-                    card_body.appendChild(title);
-                    card_body.appendChild(description);
-                    card.appendChild(card_body);
-                    deck.appendChild(card);
+                    var deck = $('<div>', {'class': 'card-deck'});
+                    var card = $('<div>', {'class': 'card'});
+                    var card_body = $('<div>', {'class': 'card_body'});
+                    var row = $('<div>', {'class': 'row'});
+                    var vote_col = $('<div>', {'class': 'col-sm-1'});
+                    var info_col = $('<div>', {'class': 'col'});
+                    var title_row = $('<div>', {'class': 'row'});
+                    var desc_row = $('<div>', {'class': 'row'});
+                    var up_count = $('<p>', {'html': response[i].upvotes});
+                    var down_count = $('<p>', {'html': response[i].downvotes});
+                    var title = $('<h5>', {
+                        'class': 'card-title',
+                        'html': response[i].title
+                    });
+                    var description = $('<p>', {
+                        'class': 'card-text',
+                        'html': response[i].description
+                    });
+                    var upvote_button = create_vote_button(true, response[i].id);
+                    var downvote_button = create_vote_button(false, response[i].id);
+
+                    vote_col.append(wrap_in_row(up_count), wrap_in_row(upvote_button), wrap_in_row(downvote_button), wrap_in_row(down_count));
+                    title_row.append(title);
+                    desc_row.append(description);
+                    info_col.append(title_row, desc_row);
+                    row.append(vote_col, info_col);
+                    card_body.append(row);
+                    card.append(card_body);
+                    deck.append(card);
+                    deals.append(deck);
                 }
             })
+        }
+
+        function wrap_in_row(obj) {
+            obj.css({'float': 'none', 'margin': '0 auto'});
+            var row = $('<div>', {
+                'class': 'row align-items-center'
+            });
+            row.append(obj);
+            return row;
+        }
+
+        function create_vote_button(upvote, deal) {
+            if (upvote) {
+                return $('<button>', {
+                    'html': "<i class='fa fa-arrow-up'></i>",
+                    'class': 'vote_buttons btn btn-light',
+                    'onclick': function () {
+                        $.ajax({
+                            url: {% url 'vote' %}
+                        }).done(function (response) {
+                            //TODO: Update html to reflect change in vote
+                            alert('Done')
+                        })
+                    }
+                });
+            } else {
+                return $('<button>', {
+                    'html': "<i class='fa fa-arrow-down'></i>",
+                    'class': "vote_buttons btn btn-light",
+                    'onclick': function () {
+                        $.ajax({
+                            url: {% url 'vote' %}
+                        }).done(function (response) {
+                            //TODO: Update html to reflect change in vote
+                            alert('Done')
+                        });
+                    }
+                });
+            }
         }
     </script>
 {% endblock %}
