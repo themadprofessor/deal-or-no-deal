@@ -17,10 +17,17 @@ def page(request):
 class CategoryView(Resource):
     """View for handling category requests"""
 
-    def get(self, request, id=None):
+    def get(self, request, id=None, deals=False):
         if id is not None:
-            category = get_object_or_404(models.Category, id=id)
-            return HttpResponse(category.to_json(), status=200, content_type='application/json')
+            if deals:
+                deals = models.Deal.objects.get(category_id=id)
+                data = []
+                for deal in deals:
+                    data.append(deal.to_dict())
+                return HttpResponse(json.dumps(data), status=200, content_type='application/json')
+            else:
+                category = get_object_or_404(models.Category, id=id)
+                return HttpResponse(category.to_json(), status=200, content_type='application/json')
         else:
             data = []
             for cat in models.Category.objects.all():

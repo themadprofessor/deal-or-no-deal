@@ -6,13 +6,27 @@
 {% endblock %}
 
 {% block body_block %}
-	<ul class="filter-strip">
-		<button class="filters" id="active" >Category 1</li>
-		<button class="filters">Category 2</li>
-		<button class="filters">Category 3</li>
+	<ul id="cat_list" class="filter-strip">
 	</ul>
 
 	<div>
 		This is the category page. <br />
 	</div>
+
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                url: {% url 'cat_all' %},
+                method: "GET"
+            }).done(function (response) {
+                for (var i = 0; i < response.length; i++) {
+                    var node = document.createElement("li");
+                    var text = document.createTextNode(response[i].name);
+                    node.className += " filters";
+                    node.appendChild(text);
+                    document.getElementById('cat_list').appendChild(node);
+                }
+            })
+        })
+    </script>
 {% endblock %}
