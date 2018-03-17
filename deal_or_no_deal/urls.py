@@ -19,8 +19,5 @@ from dondapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dondapp/', include('dondapp.urls')),
-    path('', views.home, name='home'),
-    path('about/', views.about, name='about'),
-    path('category/', views.category, name='category'),
+    path('', include('dondapp.urls')),
 ]

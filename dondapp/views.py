@@ -1,57 +1,78 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate
-from django.contrib.auth import login as django_login
-from django.contrib.auth import logout as django_logout
-from django.contrib.auth.decorators import login_required
-from django.http.response import HttpResponseNotFound, HttpResponse
-from django.views.decorators.http import require_http_methods
-from dondapp import models
 import json
 
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import redirect, get_object_or_404, render
 
-# Create your views here.
-
-@require_http_methods(['GET'])
-def home(request):
-    return render(request, 'dondapp/home.html')
-
-
-@require_http_methods(['GET'])
-def about(request):
-    return render(request, 'dondapp/about.html')
+from dondapp import models
+from .router import Resource, auth_required
 
 
-@require_http_methods(['GET'])
-def category(request):
-    return render(request, 'dondapp/category.html')
+class HomeView(Resource):
+    """View for handling index/home requests"""
+
+    def get(self, request):
+        return render(request, 'dondapp/home.html')
 
 
-@require_http_methods(['GET'])
-def failed(request):
-    return render(request, 'dondapp/failed.html')
+class AboutView(Resource):
+    """View for handling about requests"""
+
+    def get(self, request):
+        return render(request, 'dondapp/about.html')
 
 
-@require_http_methods(['POST'])
-def login(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        django_login(request, user)
-        print("Successful login")
-        return redirect("home")
-    else:
-        print("Failed login")
-        return redirect("failed")
+class CategoryView(Resource):
+    """View for handling category requests"""
+
+    def get(self, request):
+        return render(request, 'dondapp/about.html')
 
 
-@login_required
-@require_http_methods(['POST'])
-def vote(request):
-    deal_id = request.POST['deal']
-    upvote = request.POST['upvote']
-    deal = models.Deal.objects.get(deal_id=deal_id)
-    if deal is not None:
+class LoginView(Resource):
+    """View for handling login requests"""
+
+    def post(self, request):
+        if "username" not in request.POST:
+            return HttpResponseBadRequest("No username given")
+        if "password" not in request.POST:
+            return HttpResponseBadRequest("No password given")
+
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            return redirect("failed")
+
+    @auth_required
+    def delete(self, request):
+        return logout(request)
+
+
+class VoteView(Resource):
+    """View for handling voting"""
+
+    @auth_required
+    def post(self, request):
+        """
+        Adds an upvote or downvote to the deal in the request
+        :param request: HTTP POST request
+        :exception Throws Http404 if the given deal doesn't exist
+        :return: Returns HttpReponseBadRequest if either no deal or vote is specified. Returns HttpResponse with HTTP
+        OK status if the deal's votes are successfully modified
+        """
+
+        if "deal" not in request.POST:
+            return HttpResponseBadRequest("No deal given")
+        if "upvote" not in request.POST:
+            return HttpResponseBadRequest("Upvote or downvote not specified")
+
+        deal_id = request.POST['deal']
+        upvote = request.POST['upvote']
+        deal = get_object_or_404(models.Deal, deal_id=deal_id)
         if upvote:
             deal.upvotes += 1
         else:
@@ -59,26 +80,26 @@ def vote(request):
 
         deal.save()
         return HttpResponse(status=200)
-    else:
-        return HttpResponseNotFound("Deal not found")
 
+    def get(self, request):
+        """
+        Returns the upvote and downvote values of the deal specified in the given request
+        :param request: HTTP Get request
+        :exception Throws Http404 if the given deal doesn't exist
+        :return: Returns HttpResponseBadRequest if no deal is specified or HttpResponse with HTTP OK status and the
+        following JSON body:
+        {
+            'upvotes': upvotes as int,
+            'downvotes': downvotes as int
+        }
+        """
 
-@require_http_methods(['GET'])
-def vote_get(request):
-    deal_id = request.GET.get("deal_id")
-    if deal_id is not None:
-        deal = models.Deal.objects.get(deal_id=deal_id)
+        if "deal_id" not in request.GET:
+            return HttpResponseBadRequest("No deal specified")
+        deal_id = request.GET.get("deal_id")
+        deal = get_object_or_404(models.Deal, deal_id=deal_id)
         response_data = {
             'upvotes': deal.upvotes,
             'downvotes': deal.downvotes
         }
         return HttpResponse(json.dumps(response_data), status=200)
-    else:
-        return HttpResponseNotFound("Deal not found")
-
-
-@login_required
-def logout(request):
-    django_logout(request)
-    return redirect("home")
-
