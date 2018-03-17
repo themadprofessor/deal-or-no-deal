@@ -71,6 +71,8 @@ class Comment(models.Model):
 
 
 class Category(models.Model):
+    REQUIRED = ['id', 'name', 'description']
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=10)
     description = models.TextField()
