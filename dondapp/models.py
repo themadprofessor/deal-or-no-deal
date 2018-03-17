@@ -157,3 +157,16 @@ class Deal(models.Model):
             'upvotes': self.upvotes,
             'downvotes': self.downvotes
         })
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'category_id': self.category_id.id,
+            'user_id': self.user_id.username,
+            'title': self.title,
+            'description': self.description,
+            'price': self.price,
+            'creation_date': self.creation_date.timestamp(),
+            'upvotes': self.upvotes,
+            'downvotes': self.downvotes
+        }

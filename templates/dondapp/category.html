@@ -9,8 +9,10 @@
 	<ul id="cat_list" class="filter-strip">
 	</ul>
 
-	<div>
-		This is the category page. <br />
+	<div class="container">
+        <div id="deal_deck" class="card-deck">
+
+        </div>
 	</div>
 
     <script type="application/javascript">
@@ -20,13 +22,41 @@
                 method: "GET"
             }).done(function (response) {
                 for (var i = 0; i < response.length; i++) {
+                    var category = response[i];
                     var node = document.createElement("li");
-                    var text = document.createTextNode(response[i].name);
+                    var text = document.createTextNode(category.name);
                     node.className += " filters";
                     node.appendChild(text);
                     document.getElementById('cat_list').appendChild(node);
+                    node.setAttribute("onclick", "get_deals(" + category.id + ")");
                 }
             })
-        })
+        });
+
+        function get_deals(cat_id) {
+            $.ajax({
+                url: {% url 'cat_all' %} + cat_id + "/deals"
+            }).done(function (response) {
+                var deck = document.getElementById('deal_deck');
+                deck.innerHTML = ""; //Clear previous deals from screen
+                for (var i = 0; i < response.length; i++) {
+                    var card = document.createElement("div");
+                    var card_body = document.createElement("div");
+                    var title = document.createElement("h5");
+                    var description = document.createElement("p");
+                    card.className += ' card';
+                    card_body.className += ' card-body';
+                    title.className += " card-title";
+                    description.className += " card-text";
+
+                    title.innerText = response[i].title;
+                    description.innerText = response[i].description;
+                    card_body.appendChild(title);
+                    card_body.appendChild(description);
+                    card.appendChild(card_body);
+                    deck.appendChild(card);
+                }
+            })
+        }
     </script>
 {% endblock %}

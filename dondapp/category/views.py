@@ -20,7 +20,7 @@ class CategoryView(Resource):
     def get(self, request, id=None, deals=False):
         if id is not None:
             if deals:
-                deals = models.Deal.objects.get(category_id=id)
+                deals = models.Deal.objects.all().filter(category_id=id)
                 data = []
                 for deal in deals:
                     data.append(deal.to_dict())
