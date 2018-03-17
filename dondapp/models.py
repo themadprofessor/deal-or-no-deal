@@ -78,6 +78,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
+        }
+
     def to_json(self):
         return json.dumps({
             'id': self.id,

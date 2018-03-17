@@ -22,12 +22,6 @@ class AboutView(Resource):
         return render(request, 'dondapp/about.html')
 
 
-class CategoryView(Resource):
-    """View for handling category requests"""
-
-    def get(self, request):
-        return render(request, 'dondapp/about.html')
-
 class FailedView(Resource):
     def get(self, request):
         return render(request, 'dondapp/failed.html')
@@ -106,4 +100,4 @@ class VoteView(Resource):
             'upvotes': deal.upvotes,
             'downvotes': deal.downvotes
         }
-        return HttpResponse(json.dumps(response_data), status=200)
+        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

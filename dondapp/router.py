@@ -1,4 +1,4 @@
-from django.http import Http404, HttpResponseNotAllowed, HttpResponse
+from django.http import Http404, HttpResponseNotAllowed, HttpResponse, HttpResponseForbidden
 
 
 def get_handler_method(request_handler, http_method):
@@ -30,11 +30,21 @@ class Resource:
             raise Http404
 
 
-def auth_required(function):
+def auth_required(func):
     def wrapper(request, *args, **kw):
         user = request.user
         if not (user.id and request.session.get('code_success')):
             return HttpResponse(status=401)
         else:
-            return function(request, *args, **kw)
+            return func(request, *args, **kw)
     return wrapper
+
+
+def authority_required(func):
+    @auth_required
+    def wrapper(request, *args, **kwargs):
+        user = request.user
+        if user.authority:
+            return func(*args, *kwargs)
+        else:
+            return HttpResponseForbidden("Only admins can do that!")
