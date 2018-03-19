@@ -32,8 +32,8 @@ class Resource:
 
 def auth_required(func):
     def wrapper(request, *args, **kw):
-        user = request.user
-        if not (user.id and request.session.get('code_success')):
+        user = args[0].user
+        if not user.is_authenticated:
             return HttpResponse(status=401)
         else:
             return func(request, *args, **kw)
@@ -43,8 +43,9 @@ def auth_required(func):
 def authority_required(func):
     @auth_required
     def wrapper(request, *args, **kwargs):
-        user = request.user
+        user = args[0].user
         if user.authority:
-            return func(*args, *kwargs)
+            return func(request, *args, *kwargs)
         else:
             return HttpResponseForbidden("Only admins can do that!")
+    return wrapper

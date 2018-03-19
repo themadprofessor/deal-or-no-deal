@@ -10,9 +10,34 @@
     </ul>
 
     <div id='deals' class="container">
+        {% comment %}To have a vertical card deck, at card must be in its own card deck :|{% endcomment %}
     </div>
 
     <script type="application/javascript">
+        {#alert = function(mesg) {console.trace(mesg)}#}
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
         $(document).ready(function () {
             $.ajax({
                 url: {% url 'cat_all' %},
@@ -78,8 +103,14 @@
                     var info_col = $('<div>', {'class': 'col'});
                     var title_row = $('<div>', {'class': 'row'});
                     var desc_row = $('<div>', {'class': 'row'});
-                    var up_count = $('<p>', {'html': response[i].upvotes});
-                    var down_count = $('<p>', {'html': response[i].downvotes});
+                    var up_count = $('<p>', {
+                        'html': response[i].upvotes,
+                        'id': "upvote_count_" + response[i].id
+                    });
+                    var down_count = $('<p>', {
+                        'html': response[i].downvotes,
+                        'id': "downvote_count_" + response[i].id
+                    });
                     var title = $('<h5>', {
                         'class': 'card-title',
                         'html': response[i].title
@@ -114,33 +145,30 @@
         }
 
         function create_vote_button(upvote, deal) {
-            if (upvote) {
-                return $('<button>', {
-                    'html': "<i class='fa fa-arrow-up'></i>",
-                    'class': 'vote_buttons btn btn-light',
-                    'onclick': function () {
-                        $.ajax({
-                            url: {% url 'vote' %}
-                        }).done(function (response) {
-                            //TODO: Update html to reflect change in vote
-                            alert('Done')
-                        })
-                    }
-                });
-            } else {
-                return $('<button>', {
-                    'html': "<i class='fa fa-arrow-down'></i>",
-                    'class': "vote_buttons btn btn-light",
-                    'onclick': function () {
-                        $.ajax({
-                            url: {% url 'vote' %}
-                        }).done(function (response) {
-                            //TODO: Update html to reflect change in vote
-                            alert('Done')
-                        });
-                    }
-                });
-            }
+            var button = $('<button>',{
+                'html': "<i class='fa fa-arrow-" + (upvote?"up":"down") + "'></i>",
+                'class': 'vote_buttons btn btn-light'
+            });
+            button.click(function () {
+                $.ajax({
+                    url: {% url 'vote' %},
+                    method: 'POST',
+                    data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }).done(function () {
+                    $.ajax({
+                        url: {% url 'vote' %},
+                        method: 'GET',
+                        data: {'deal_id': deal}
+                    }).done(function (response) {
+                        $('#upvote_count_'+deal).html(response['upvotes']);
+                        $('#downvote_count_'+deal).html(response['downvotes']);
+                    })
+                }).fail(function (response, status, error) {
+                    alert(error + "\n" + response.responseText)
+                })
+            });
+            return button;
         }
     </script>
 {% endblock %}

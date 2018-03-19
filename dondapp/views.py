@@ -63,18 +63,12 @@ class VoteView(Resource):
         OK status if the deal's votes are successfully modified
         """
 
-        if "deal" not in request.POST:
-            return HttpResponseBadRequest("No deal given")
-        if "upvote" not in request.POST:
-            return HttpResponseBadRequest("Upvote or downvote not specified")
-
-        deal_id = request.POST['deal']
-        upvote = request.POST['upvote']
-        deal = get_object_or_404(models.Deal, deal_id=deal_id)
-        if upvote:
+        data = json.loads(request.body)
+        deal = get_object_or_404(models.Deal, id=data['deal_id'])
+        if data['upvote']:
             deal.upvotes += 1
         else:
-            deal.downvotes -= 1
+            deal.downvotes += 1
 
         deal.save()
         return HttpResponse(status=200)
@@ -94,8 +88,8 @@ class VoteView(Resource):
 
         if "deal_id" not in request.GET:
             return HttpResponseBadRequest("No deal specified")
-        deal_id = request.GET.get("deal_id")
-        deal = get_object_or_404(models.Deal, deal_id=deal_id)
+        deal_id = request.GET["deal_id"]
+        deal = get_object_or_404(models.Deal, id=deal_id)
         response_data = {
             'upvotes': deal.upvotes,
             'downvotes': deal.downvotes

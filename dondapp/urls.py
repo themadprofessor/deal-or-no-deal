@@ -7,5 +7,5 @@ urlpatterns = [
     path('category/', include('dondapp.category.urls')),
     path('login/', views.LoginView.dispatch, name='login'),
     path('failed/', views.FailedView.dispatch, name='failed'),
-    path('vote/', views.VoteView, name='vote'),
+    path('vote/', views.VoteView.dispatch, name='vote'),
 ]
