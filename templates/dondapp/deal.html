@@ -10,16 +10,16 @@
         <div class="row">
             <div class="col-sm-1">
                 <div class="row align-items-center">
-                    <p style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
+                    <p id="upvote_count" style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
                 </div>
                 <div class="row">
-                    <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-up'></i></button>
+                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-up'></i></button>
                 </div>
                 <div class="row">
-                    <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-down'></i></button>
+                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-down'></i></button>
                 </div>
                 <div class="row aligm-items-center">
-                    <p style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
+                    <p id="downvote_count" style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
                 </div>
             </div>
             <div class="col">
@@ -69,4 +69,48 @@
     </div>
 
     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5aaff649b965af90"></script>
+    <script>
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
+        function send_vote (deal, upvote) {
+                $.ajax({
+                    url: {% url 'vote' %},
+                    method: 'POST',
+                    data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }).done(function () {
+                    $.ajax({
+                        url: {% url 'vote' %},
+                        method: 'GET',
+                        data: {'deal_id': deal}
+                    }).done(function (response) {
+                        $('#upvote_count').html(response['upvotes']);
+                        $('#downvote_count').html(response['downvotes']);
+                    })
+                }).fail(function (response, status, error) {
+                    alert(error + "\n" + response.responseText)
+                })
+            }
+    </script>
 {% endblock %}
