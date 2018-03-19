@@ -143,6 +143,8 @@ class Deal(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     upvotes = models.IntegerField(default=0)
     downvotes = models.IntegerField(default=0)
+    image_path = models.CharField(max_length=128, blank=True, default='')
+    url = models.URLField(blank=True)
 
     def __str__(self):
         return self.title
@@ -160,5 +162,6 @@ class Deal(models.Model):
             'price': self.price,
             'creation_date': self.creation_date.timestamp(),
             'upvotes': self.upvotes,
-            'downvotes': self.downvotes
+            'downvotes': self.downvotes,
+            'image_path': self.image_path
         }

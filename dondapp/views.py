@@ -3,6 +3,8 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, get_object_or_404, render
+from django.conf import settings
+from os import path
 
 from dondapp import models
 from .router import Resource, auth_required
@@ -25,6 +27,21 @@ class AboutView(Resource):
 class FailedView(Resource):
     def get(self, request):
         return render(request, 'dondapp/failed.html')
+
+
+class DealView(Resource):
+    def get(self, request, id):
+        deal = models.Deal.objects.get(id=id)
+        # Do not save this deal obj, its just used to populate the template's image src path
+        if deal.image_path == '':
+            deal.image_path = path.join(settings.STATIC_URL, 'no-img.png')
+        else:
+            deal.image_path = path.join(settings.MEDIA_URL, deal.image_path)
+        context = {
+            'deal': deal,
+            'comments': models.Comment.objects.filter(deal_id=id)
+        }
+        return render(request, 'dondapp/deal.html', context=context)
 
 
 class LoginView(Resource):

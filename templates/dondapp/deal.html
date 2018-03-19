@@ -1,0 +1,72 @@
+{% extends 'dondapp/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+{{ deal.title }}
+{% endblock %}
+
+{% block body_block %}
+    <div class="container border rounded" style="background: white; padding: 1em">
+        <div class="row">
+            <div class="col-sm-1">
+                <div class="row align-items-center">
+                    <p style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
+                </div>
+                <div class="row">
+                    <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-up'></i></button>
+                </div>
+                <div class="row">
+                    <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-down'></i></button>
+                </div>
+                <div class="row aligm-items-center">
+                    <p style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
+                </div>
+            </div>
+            <div class="col">
+                <img style="max-width: 7em; height: auto" src="{{ deal.image_path }}" alt="Deal image">
+            </div>
+            <div class="col">
+                <div class="row">
+                    <h5>{{ deal.title }}</h5>
+                </div>
+                <div class="row justify-content-end align-items-end">
+                    <p>{{ deal.price }}</p>
+                </div>
+                {% if deal.url != '' %}
+                <div class="row">
+                    <a href="{{ deal.url }}">Get Deal</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <p><strong>By {{ deal.user_id }}</strong> {{ deal.creation_date }}</p>
+        </div>
+        <div class="row">
+            <p>{{ deal.description }}</p>
+        </div>
+        <div class="row">
+            <div class="addthis_inline_share_toolbox"></div>
+        </div>
+        <div class="row">
+            <h5>Comments</h5>
+        </div>
+        {% for comment in comments %}
+            <div class="row">
+                <div class="col-sm-1">
+                    <img src="{% static 'no-img.png' %}" style="max-width: 100%" alt="Avatar">
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <p><strong>{{ comment.user_id }}</strong> {{ comment.creation_date }}</p>
+                    </div>
+                    <div class="row">
+                        <p>{{ comment.content }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5aaff649b965af90"></script>
+{% endblock %}

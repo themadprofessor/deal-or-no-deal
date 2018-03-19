@@ -14,7 +14,6 @@
     </div>
 
     <script type="application/javascript">
-        {#alert = function(mesg) {console.trace(mesg)}#}
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
                 function getCookie(name) {
@@ -113,7 +112,7 @@
                     });
                     var title = $('<h5>', {
                         'class': 'card-title',
-                        'html': response[i].title
+                        'html': ('<a href="' + '{% url 'deal' id=1 %}' + '">' + response[i].title + "</a>").replace("1", response[i].id)
                     });
                     var description = $('<p>', {
                         'class': 'card-text',
