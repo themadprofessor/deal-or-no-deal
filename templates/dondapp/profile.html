@@ -15,5 +15,31 @@ Profile - {{ user.username }}
                 <p>{{ user.likes }} <i class="fas fa-thumbs-up"></i></p>
             </div>
         </div>
+        <div class="container border rounded" style="background: white; margin-top: 1em">
+            {% for deal in deals %}
+                <div class="row border-bottom" style="">
+                    <div class="col-sm-1">
+                        <div class="row align-items-center">
+                            <p style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
+                        </div>
+                        <div class="row align-items-center">
+                            <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-up"></i></button>
+                        </div>
+                        <div class="row align-items-center">
+                            <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-down"></i></button>
+                        </div>
+                        <div class="row align-items-center">
+                            <p style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card-body">
+                            <h5><a href="{% url 'deal' deal.id %}">{{ deal.title }}</a></h5>
+                            <p>{{ deal.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

@@ -93,7 +93,11 @@ class CommentView(Resource):
 class UserView(Resource):
     def get(self, request, username=None):
         if username:
-            context = {'user': models.User.objects.get(username=username)}
+            user = models.User.objects.get(username=username)
+            context = {
+                'user': user,
+                'deals': models.Deal.objects.filter(user_id=user)
+            }
             return render(request, 'dondapp/profile.html', context=context)
         else:
             if 'username' not in request.GET:

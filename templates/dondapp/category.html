@@ -62,7 +62,7 @@
                     *             </div>
                     *             <div class="col">
                     *                 <div class="card-body">
-                    *                     <h5>title</h5>
+                    *                     <h5><a href="deal url">title</a></h5>
                     *                     <p>description</p>
                     *                 </div>
                     *             </div>
@@ -123,7 +123,7 @@
 
         function create_vote_button(upvote, deal) {
             var button = $('<button>',{
-                'html': "<i class='fa fa-arrow-" + (upvote?"up":"down") + "'></i>",
+                'html': "<i class='fas fas-chevron-" + (upvote?"up":"down") + "'></i>",
                 'class': 'vote_buttons btn btn-light'
             });
             button.click(function () {

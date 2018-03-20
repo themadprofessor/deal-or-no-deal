@@ -191,7 +191,7 @@
                 url: {% url 'login' %},
                 method: 'DELETE'
             }).always(function () {
-                location.reload(true)
+                location.href = {% url 'home' %};
             })
         }
 
