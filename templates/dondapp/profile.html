@@ -1,0 +1,19 @@
+{% extends 'dondapp/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+Profile - {{ user.username }}
+{% endblock %}
+
+{% block body_block %}
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h5>{{ user.username }}</h5>
+                <p>{{ user.email }}</p>
+                <p>{{ user.first_name }} {{ user.last_name }}</p>
+                <p>{{ user.likes }} <i class="fas fa-thumbs-up"></i></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

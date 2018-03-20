@@ -56,8 +56,7 @@
                         {{ user.username }}
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="{% url 'user_profile' user.username %}">Profile</a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="logout()">Logout</button>
                     </div>
@@ -104,6 +103,7 @@
         {% endblock %}
     </div>
 
+    {% if not user.is_authenticated %}
     <div id="login-model" class="model">
         <form class="model-content" action="{% url 'login' %}" method="post">
             {% csrf_token %}
@@ -157,6 +157,7 @@
             </div>
         </form>
     </div>
+    {% endif %}
 
     <script type="application/javascript">
         function open_login() {
@@ -211,23 +212,6 @@
         $(document).ready(function () {
             var loc = $(location).attr('pathname').split('/')[1];
             $('#nav_' + loc).addClass('active');
-            {% comment %}$('#request-form').submit(function (e) {
-                e.preventDefault();
-                console.log("Interceptted");
-                var form = this;
-                $.ajax({
-                    url: {% url 'user' %},
-                    method: 'GET',
-                    data: 'username=' + encodeURIComponent($('#register-username').val())
-                }).fail(function () {
-                    form.submit();
-                }).done(function () {
-                    var alert = $('#register-alert');
-                    alert.html('Username is taken');
-                    alert.alert();
-                });
-                return false;
-            });{% endcomment %}
         });
 
         //This setup is needed to let Django accept AJAX requests from this page by setting up the CSRF token correctly

@@ -3,9 +3,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404, render
-from django.conf import settings
 from django.db.models import Q
-from os import path
 
 from dondapp import models
 from .router import Resource, auth_required
@@ -58,9 +56,8 @@ class DealView(Resource):
 class UserView(Resource):
     def get(self, request, username=None):
         if username:
-            # TODO: Go to profile of user
-            print("In username given bit")
-            return HttpResponse(status=418)  # I'm a teapot
+            context = {'user': models.User.objects.get(username=username)}
+            return render(request, 'dondapp/profile.html', context=context)
         else:
             if 'username' not in request.GET:
                 return HttpResponseBadRequest('No username given')
