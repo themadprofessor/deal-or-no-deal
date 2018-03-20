@@ -29,7 +29,7 @@
                     <a class="nav-link" href="{% url 'category' %}">Category</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" href="{% url 'about' %}">About</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,8 +45,8 @@
             </ul>
 
             <div class="search-container">
-                <form action="/action_page.php">
-                    <input type="text" placeholder="Search..." name="search">
+                <form action="/search" method="get">
+                    <input type="text" placeholder="Search..." name="query">
                     <button type="submit"><i class="fa fa-search"></i></button>
                 </form>
             </div>
@@ -65,7 +65,6 @@
             {% else %}
                 <button onclick="open_login()" class="btn btn-light">Login</button>
             {% endif %}
-{#            <button class="btn btn-outline-success my-2 my-sm-0 fa fa-search" type="submit">Search</button>#}
         </div>
     </nav>
 
@@ -102,20 +101,10 @@
     <div>
         {% block body_block %}
         {% endblock %}
-    <div class="dropdown">
-                        <a href="#" class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown button
-                        </a>
-                        <div class="dropdown-menu" style="position: relative" role="menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </div>
     </div>
 
     <div id="login-model" class="model">
-    <form class="model-content" action="{% url 'login' %}", method="post">
+    <form class="model-content" action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="container">
             <label for="username"><b>Username</b></label>

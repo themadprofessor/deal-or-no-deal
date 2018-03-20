@@ -8,5 +8,6 @@ urlpatterns = [
     path('login/', views.LoginView.dispatch, name='login'),
     path('failed/', views.FailedView.dispatch, name='failed'),
     path('vote/', views.VoteView.dispatch, name='vote'),
-    path('deal/<int:id>', views.DealView.dispatch, name='deal')
+    path('deal/<int:id>/', views.DealView.dispatch, name='deal'),
+    path('search/', views.SearchView.dispatch, name='search')
 ]

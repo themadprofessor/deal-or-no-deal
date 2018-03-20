@@ -1,0 +1,83 @@
+{% extends 'dondapp/base.html' %}
+{% load staticfiles %}
+
+{% block title_block %}
+    Search - {{ query }}
+{% endblock %}
+
+{% block body_block %}
+    <div class="container">
+        {% for deal in deals %}
+            {% comment %}<div class="card-deck" style="padding: 0.5em">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-1">
+                                <div class="row align-items-center">
+                                    <p id="upvote_count" style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
+                                </div>
+                                <div class="row">
+                                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-up'></i></button>
+                                </div>
+                                <div class="row">
+                                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-down'></i></button>
+                                </div>
+                                <div class="row aligm-items-center">
+                                    <p id="downvote_count" style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <img style="max-width: 7em; height: auto" src="{{ deal.image_path }}" alt="Deal image">
+                            </div>
+                            <div class="col">
+                                <div class="row">
+                                    <h5>{{ deal.title }}</h5>
+                                </div>
+                                <div class="row justify-content-end align-items-end">
+                                    <p>{{ deal.price }}</p>
+                                </div>
+                                {% if deal.url != '' %}
+                                    <div class="row">
+                                        <a href="{{ deal.url }}">Get Deal</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <p><strong>By {{ deal.user_id }}</strong> {{ deal.creation_date }}</p>
+                        </div>
+                        <div class="row">
+                            <p>{{ deal.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>{% endcomment %}
+            <div class="card-deck" style="padding: 0.5em">
+                <div class="card">
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <div class="row">
+                                <p style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
+                            </div>
+                            <div class="row">
+                                <button class="vote_buttons btn btn-light" style="float: none; margin: 0 auto"><i class='fa fa-arrow-up'></i></button>
+                            </div>
+                            <div class="row">
+                                <button class="vote_buttons btn btn-light" style="float: none; margin: 0 auto"><i class='fa fa-arrow-down'></i></button>
+                            </div>
+                            <div class="row">
+                                <p style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-body">
+                                <h5><a href="/deal/{{ deal.id }}">{{ deal.title }}</a></h5>
+                                <p>{{ deal.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,5 +1,7 @@
 import json
 
+import os
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -143,7 +145,7 @@ class Deal(models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     upvotes = models.IntegerField(default=0)
     downvotes = models.IntegerField(default=0)
-    image_path = models.CharField(max_length=128, blank=True, default='')
+    image_path = models.URLField(default=settings.STATIC_URL + "no-img.png")
     url = models.URLField(blank=True)
 
     def __str__(self):
