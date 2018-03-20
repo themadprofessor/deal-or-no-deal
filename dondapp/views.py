@@ -52,7 +52,14 @@ class DealView(Resource):
             'comments': models.Comment.objects.filter(deal_id=id)
         }
         return render(request, 'dondapp/deal.html', context=context)
-
+        
+class AllDealView(Resource):
+    def get(self, request):
+        deals = models.Deal.objects.all()
+        data = []
+        for deal in deals:
+            data.append(deal.to_dict())
+        return HttpResponse(json.dumps(data), status=200, content_type="application/json")
 
 class CommentView(Resource):
     def get(self, request):
