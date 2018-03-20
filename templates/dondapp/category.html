@@ -23,14 +23,15 @@
                     var category = response[i];
                     var node = document.createElement("li");
                     var text = document.createTextNode(category.name);
-                    node.className += " filters";
+					var cName = category.name;
+                    node.className += `filters ${cName}`;
                     node.appendChild(text);
                     document.getElementById('cat_list').appendChild(node);
                     node.setAttribute("onclick", "get_deals(" + category.id + ")"); //Slight hack to keep category.id in args
                 }
             })
+			get_deals(1);
         });
-
         function get_deals(cat_id) {
             $.ajax({
                 url: {% url 'cat_all' %} + cat_id + "/deals"
