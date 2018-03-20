@@ -1,7 +1,7 @@
 import json
 
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404, render
 from django.conf import settings
 from django.db.models import Q
@@ -53,6 +53,62 @@ class DealView(Resource):
             'comments': models.Comment.objects.filter(deal_id=id)
         }
         return render(request, 'dondapp/deal.html', context=context)
+
+
+class UserView(Resource):
+    def get(self, request, username=None):
+        if username:
+            # TODO: Go to profile of user
+            print("In username given bit")
+            return HttpResponse(status=418)  # I'm a teapot
+        else:
+            if 'username' not in request.GET:
+                return HttpResponseBadRequest('No username given')
+
+            if not models.User.objects.filter(username=request.GET['username']).exists():
+                return HttpResponse('User not found', status=404)
+
+            user = models.User.objects.get(username=request.GET['username'])
+            return HttpResponse(user.to_json(), status=200)
+
+    def post(self, request):
+        if 'username' in request.POST:
+            if models.User.objects.filter(username=request.POST['username']).exists():
+                if not request.user.is_authenticated:
+                    return HttpResponse(status=401)
+
+                if request.user.username != request.POST['username'] and not request.user.is_superuser:
+                    return HttpResponseForbidden('Only admins can do that')
+
+                # Update existing user
+                user = models.User.objects.get(username=request.POST['username'])
+                for attr in models.User.UPDATEABLE:
+                    setattr(user, attr, request.POST[attr])
+
+                # Only let superuser's change authority
+                user.authority = request.POST.get('authority', user.authority) if user.is_superuser else user.authority
+                user.save()
+
+                if 'password' in request.POST:
+                    return LoginView.delete(request)
+                else:
+                    return redirect('home')
+            else:
+                # Create new user
+                for required in models.User.REQUIRED:
+                    if required not in request.POST:
+                        return HttpResponseBadRequest(required + " not specified")
+
+                if models.User.objects.filter(username=request.POST['username']).exists():
+                    return HttpResponseBadRequest("Username is taken")
+
+                user = models.User.objects.create_user(request.POST['username'], request.POST['first_name'],
+                                                       request.POST['last_name'], request.POST['email'],
+                                                       request.POST['password'], request.POST.get('likes', default=0),
+                                                       authority=False)
+                user.save()
+                # Log the user in after they register
+                return LoginView().post(request)
 
 
 class LoginView(Resource):

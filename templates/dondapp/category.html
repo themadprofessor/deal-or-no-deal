@@ -90,6 +90,7 @@
                     var title = $('<h5>', {
                         'class': 'card-title',
                         'html': ('<a href="' + '{% url 'deal' id=1 %}' + '">' + response[i].title + "</a>").replace("1", response[i].id)
+                        {# Build deal url by replacing 1 with this deal's id #}
                     });
                     var description = $('<p>', {
                         'class': 'card-text',

@@ -104,6 +104,9 @@ class User(AbstractUser):
     likes = models.IntegerField("Number of likes", default=0)
     authority = models.BooleanField(default=False)
 
+    REQUIRED = ['username', 'first_name', 'last_name', 'email', 'password']
+    UPDATEABLE = ['first_name', 'last_name', 'email', 'password', 'likes']
+
     # Unique ID used by Django
     USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"

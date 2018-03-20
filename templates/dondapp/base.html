@@ -31,7 +31,7 @@
                 <li id="nav_about" class="nav-item">
                     <a class="nav-link" href="{% url 'about' %}">About</a>
                 </li>
-                <li class="nav-item dropdown">
+                {% comment %}<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Dropdown
                     </a>
@@ -41,7 +41,7 @@
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Something else here</a>
                     </div>
-                </li>
+                </li>{% endcomment %}
             </ul>
 
             <div class="search-container">
@@ -64,6 +64,7 @@
                 </div>
             {% else %}
                 <button onclick="open_login()" class="btn btn-light">Login</button>
+                <button onclick="open_register()" class="btn btn-light">Register</button>
             {% endif %}
         </div>
     </nav>
@@ -104,26 +105,57 @@
     </div>
 
     <div id="login-model" class="model">
-    <form class="model-content" action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        <div class="container">
-            <label for="username"><b>Username</b></label>
-            <input type="text" placeholder="Enter Username" name="username" required>
+        <form class="model-content" action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <div class="container">
+                <label for="username"><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="username" required>
 
-            <label for="password"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="password" required>
+                <label for="password"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="password" required>
 
-            <button type="submit">Login</button>
-            <label>
-                <input type="checkbox" checked="checked" name="remember"> Remember Me
-            </label>
-        </div>
+                <button type="submit">Login</button>
+                <label>
+                    <input type="checkbox" checked="checked" name="remember"> Remember Me
+                </label>
+            </div>
 
-        <div class="container" style="background-color:#3e4042">
-            <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:8em"onclick="close_login()">Cancel</button>
-            <span class="psw">Forgot <a href="#">password?</a></span>
-        </div>
-    </form>
+            <div class="container" style="background-color:#3e4042">
+                <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:8em"onclick="close_login()">Cancel</button>
+                <span class="psw">Forgot <a href="#">password?</a></span>
+            </div>
+        </form>
+    </div>
+
+    <div id="register-model" class="model">
+        <form id="register-form" class="model-content" action="{% url 'user' %}" method="post">
+            {% csrf_token %}
+            <div class="container">
+                <label for="username"><b>Username</b></label>
+                <input id="register-username" class="form-text-input" type="text" placeholder="Enter Username" name="username" required>
+
+                <label for="password"><b>Password</b></label>
+                <input class="form-text-input" type="password" placeholder="Enter Password" name="password" required>
+
+                <label for="first_name"><b>First Name</b></label>
+                <input class="form-text-input" type="text" placeholder="First Name" name="first_name" required>
+
+                <label for="last_name"><b>Last Name</b></label>
+                <input class="form-text-input" type="text" placeholder="Last Name" name="last_name" required>
+
+                <label for="email"><b>Email</b></label>
+                <input class="form-text-input" type="email" placeholder="Email" name="email" required>
+
+                <button type="button" onclick="register()">Register</button>
+            </div>
+
+            <div class="container" style="background-color:#3e4042">
+                <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:8em" onclick="close_register()">Cancel</button>
+            </div>
+            <div id="register-alert" class="alert alert-danger" role="alert">
+
+            </div>
+        </form>
     </div>
 
     <script type="application/javascript">
@@ -139,6 +171,18 @@
             model.style.opacity = "0";
         }
 
+        function open_register() {
+            var model = document.getElementById("register-model");
+            model.style.zIndex = "1";
+            model.style.opacity = "1";
+        }
+
+        function close_register() {
+            var model = document.getElementById("register-model");
+            model.style.zIndex = "-999";
+            model.style.opacity = "0";
+        }
+
         function logout() {
             $.ajax({
                 url: {% url 'login' %},
@@ -148,9 +192,42 @@
             })
         }
 
+        function register() {
+            var form = $('#register-form');
+            $.ajax({
+                url: {% url 'user' %},
+                method: 'GET',
+                data: 'username=' + encodeURIComponent($('#register-username').val())
+            }).fail(function () {
+                form.submit();
+            }).done(function () {
+                var alert = $('#register-alert');
+                alert.html('Username is taken');
+                alert.alert();
+            });
+            return false;
+        }
+
         $(document).ready(function () {
             var loc = $(location).attr('pathname').split('/')[1];
             $('#nav_' + loc).addClass('active');
+            {% comment %}$('#request-form').submit(function (e) {
+                e.preventDefault();
+                console.log("Interceptted");
+                var form = this;
+                $.ajax({
+                    url: {% url 'user' %},
+                    method: 'GET',
+                    data: 'username=' + encodeURIComponent($('#register-username').val())
+                }).fail(function () {
+                    form.submit();
+                }).done(function () {
+                    var alert = $('#register-alert');
+                    alert.html('Username is taken');
+                    alert.alert();
+                });
+                return false;
+            });{% endcomment %}
         });
 
         //This setup is needed to let Django accept AJAX requests from this page by setting up the CSRF token correctly
