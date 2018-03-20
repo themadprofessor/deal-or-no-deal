@@ -59,6 +59,8 @@ class Comment(models.Model):
     creation_date = models.DateTimeField()
     content = models.TextField()
 
+    REQUIRED = ['deal_id', 'content']
+
     def __str__(self):
         return self.content
 

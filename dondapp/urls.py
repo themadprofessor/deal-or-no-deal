@@ -11,5 +11,6 @@ urlpatterns = [
     path('deal/<int:id>/', views.DealView.dispatch, name='deal'),
     path('search/', views.SearchView.dispatch, name='search'),
     path('user/', views.UserView.dispatch, name='user'),
-    path('user/<str:username>', views.UserView.dispatch, name='user_profile')
+    path('user/<str:username>', views.UserView.dispatch, name='user_profile'),
+    path('comment/', views.CommentView.dispatch, name='comment'),
 ]

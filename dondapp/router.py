@@ -34,7 +34,7 @@ def auth_required(func):
     def wrapper(request, *args, **kw):
         user = args[0].user
         if not user.is_authenticated:
-            return HttpResponse(status=401)
+            return HttpResponse("Not logged in", status=401)
         else:
             return func(request, *args, **kw)
     return wrapper

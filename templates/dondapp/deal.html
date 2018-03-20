@@ -7,16 +7,16 @@
 
 {% block body_block %}
     <div class="container border rounded" style="background: white; padding: 1em">
-        <div class="row">
+        <div class="row border-bottom">
             <div class="col-sm-1">
                 <div class="row align-items-center">
                     <p id="upvote_count" style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
                 </div>
                 <div class="row">
-                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-up'></i></button>
+                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-up"></i></button>
                 </div>
                 <div class="row">
-                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class='fa fa-arrow-down'></i></button>
+                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="row aligm-items-center">
                     <p id="downvote_count" style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
@@ -29,7 +29,7 @@
                 <div class="row">
                     <h5>{{ deal.title }}</h5>
                 </div>
-                <div class="row justify-content-end align-items-end">
+                <div class="row  justify-content-end align-items-end">
                     <p>{{ deal.price }}</p>
                 </div>
                 {% if deal.url != '' %}
@@ -39,7 +39,7 @@
                 {% endif %}
             </div>
         </div>
-        <div class="row">
+        <div class="row border-bottom">
             <p><strong>By {{ deal.user_id }}</strong> {{ deal.creation_date }}</p>
         </div>
         <div class="row">
@@ -49,16 +49,24 @@
             <div class="addthis_inline_share_toolbox"></div>
         </div>
         <div class="row">
-            <h5>Comments</h5>
+            <div class="col-md-1">
+                <h5>Comments</h5>
+            </div>
+            <div class="col justify-content-end items-align-end">
+                <button onclick="open_comment()" style="float: right" class="btn btn-light"><i class="fas fa-edit"></i></button>
+            </div>
         </div>
         {% for comment in comments %}
-            <div class="row" style="padding: 0.5em">
+            <div class="row border-top" style="padding: 0.5em">
                 <div class="col-sm-1">
                     <img src="{% static 'no-img.png' %}" style="max-width: 100%" alt="Avatar">
                 </div>
                 <div class="col">
                     <div class="row">
                         <p><strong>{{ comment.user_id }}</strong> {{ comment.creation_date }}</p>
+                        {% if user.username == comment.user_id %}
+                        <button onclick="deleteComment({{ comment.id }})" style="float: right" class="btn btn-light"><i class="fas fa-trash"></i></button>
+                        {% endif %}
                     </div>
                     <div class="row">
                         <p>{{ comment.content }}</p>
@@ -68,26 +76,71 @@
         {% endfor %}
     </div>
 
+    <div id="comment-model" class="model">
+        <form id="comment-form" class="model-content" action="{% url 'comment' %}" method="post">
+            {% csrf_token %}
+            <div class="container">
+                <label for="content"><b>Comment</b></label>
+                <input style="width: 100%" maxlength="500" type="text" placeholder="comment" name="content" required>
+                <input type="hidden" value="{{ deal.id }}" name="deal_id">
+
+                <button type="button" onclick="send_comment()">Post</button>
+            </div>
+
+            <div class="container" style="background-color:#3e4042">
+                <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:8em" onclick="close_comment()">Cancel</button>
+            </div>
+        </form>
+    </div>
+
     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5aaff649b965af90"></script>
     <script>
+        function deleteComment(id) {
+
+        }
+
+        function send_comment() {
+            $.ajax({
+                url: {% url 'comment' %},
+                method: 'POST',
+                data: $('#comment-form').serialize()
+            }).done(function () {
+                location.reload(true);
+            }).fail(function (request) {
+                alert(request.responseText)
+            })
+        }
+
         function send_vote (deal, upvote) {
+            $.ajax({
+                url: {% url 'vote' %},
+                method: 'POST',
+                data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }).done(function () {
                 $.ajax({
                     url: {% url 'vote' %},
-                    method: 'POST',
-                    data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                }).done(function () {
-                    $.ajax({
-                        url: {% url 'vote' %},
-                        method: 'GET',
-                        data: {'deal_id': deal}
-                    }).done(function (response) {
-                        $('#upvote_count').html(response['upvotes']);
-                        $('#downvote_count').html(response['downvotes']);
-                    })
-                }).fail(function (response, status, error) {
-                    alert(error + "\n" + response.responseText)
+                    method: 'GET',
+                    data: {'deal_id': deal}
+                }).done(function (response) {
+                    $('#upvote_count').html(response['upvotes']);
+                    $('#downvote_count').html(response['downvotes']);
                 })
-            }
+            }).fail(function (response, status, error) {
+                alert(error + "\n" + response.responseText)
+            })
+        }
+
+        function open_comment() {
+            var model = document.getElementById("comment-model");
+            model.style.zIndex = "1";
+            model.style.opacity = "1";
+        }
+
+        function close_comment() {
+            var model = document.getElementById("comment-model");
+            model.style.zIndex = "-999";
+            model.style.opacity = "0";
+        }
     </script>
 {% endblock %}

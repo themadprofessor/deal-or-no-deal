@@ -1,5 +1,6 @@
 import json
 
+import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404, render
@@ -44,13 +45,36 @@ class SearchView(Resource):
 
 class DealView(Resource):
     def get(self, request, id):
-        deal = models.Deal.objects.get(id=id)
+        deal = get_object_or_404(models.Deal, id=id)
         # Do not save this deal obj, its just used to populate the template's image src path
         context = {
             'deal': deal,
             'comments': models.Comment.objects.filter(deal_id=id)
         }
         return render(request, 'dondapp/deal.html', context=context)
+
+
+class CommentView(Resource):
+    def get(self, request):
+        if 'id' not in request.GET:
+            return HttpResponseBadRequest("No id given")
+        comment = models.Comment.objects.get(id=request.GET['id'])
+        return HttpResponse(comment.to_json(), status=200)
+
+    @auth_required
+    def post(self, request):
+        for required in models.Comment.REQUIRED:
+            if required not in request.POST:
+                return HttpResponseBadRequest(required + " not specified")
+
+        if not models.Deal.objects.filter(id=request.POST['deal_id']).exists():
+            return HttpResponse("Deal not found", status=404)
+
+        comment = models.Comment(deal_id=models.Deal.objects.get(id=request.POST['deal_id']),
+                                 user_id=request.user, creation_date=datetime.datetime.now(),
+                                 content=request.POST['content'])
+        comment.save()
+        return HttpResponse(status=200)
 
 
 class UserView(Resource):
