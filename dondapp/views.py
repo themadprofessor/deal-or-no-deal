@@ -76,6 +76,19 @@ class CommentView(Resource):
         comment.save()
         return HttpResponse(status=200)
 
+    @auth_required
+    def delete(self, request, id):
+        try:
+            comment = models.Comment.objects.get(id=id)
+        except models.Comment.DoesNotExist:
+            return HttpResponse('Comment not found', status=404)
+
+        if request.user.username != comment.user_id.username and not request.user.is_superuser:
+            return HttpResponseForbidden('Only admins can do that')
+
+        comment.delete()
+        return HttpResponse(status=200)
+
 
 class UserView(Resource):
     def get(self, request, username=None):

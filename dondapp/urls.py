@@ -13,4 +13,5 @@ urlpatterns = [
     path('user/', views.UserView.dispatch, name='user'),
     path('user/<str:username>', views.UserView.dispatch, name='user_profile'),
     path('comment/', views.CommentView.dispatch, name='comment'),
+    path('comment/<int:id>', views.CommentView.dispatch, name='comment_id')
 ]

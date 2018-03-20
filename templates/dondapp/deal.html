@@ -63,9 +63,13 @@
                 </div>
                 <div class="col">
                     <div class="row">
+                        <div class="col-md" style="padding: 0">
                         <p><strong>{{ comment.user_id }}</strong> {{ comment.creation_date }}</p>
-                        {% if user.username == comment.user_id %}
-                        <button onclick="deleteComment({{ comment.id }})" style="float: right" class="btn btn-light"><i class="fas fa-trash"></i></button>
+                        </div>
+                        {% if user.username == comment.user_id.username or user.is_superuser %}
+                        <div class="col-sm-2 items-align-end">
+                            <button onclick="deleteComment({{ comment.id }})" style="float: right" class="btn btn-light"><i class="fas fa-trash"></i></button>
+                        </div>
                         {% endif %}
                     </div>
                     <div class="row">
@@ -96,7 +100,16 @@
     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5aaff649b965af90"></script>
     <script>
         function deleteComment(id) {
-
+            if (confirm("Are you sure you wish to delete this comment?")){
+                $.ajax({
+                    url: "{% url 'comment_id' 1 %}".replace('1', id),
+                    method: 'DELETE'
+                }).done(function () {
+                    location.reload(true)
+                }).fail(function (response) {
+                    alert(response.responseText)
+                })
+            }
         }
 
         function send_comment() {
