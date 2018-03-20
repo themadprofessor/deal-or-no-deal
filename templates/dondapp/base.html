@@ -26,7 +26,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Category</a>
+                    <a class="nav-link" href="{% url 'category' %}">Category</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">About</a>
@@ -50,6 +50,21 @@
                     <button type="submit"><i class="fa fa-search"></i></button>
                 </form>
             </div>
+            {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ user.username }}
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            {% else %}
+                <button onclick="open_login()" class="btn btn-light">Login</button>
+            {% endif %}
 {#            <button class="btn btn-outline-success my-2 my-sm-0 fa fa-search" type="submit">Search</button>#}
         </div>
     </nav>
@@ -134,6 +149,40 @@
             model.style.zIndex = "-999";
             model.style.opacity = "0";
         }
+
+        function logout() {
+            $.ajax({
+                url: {% url 'login' %},
+                method: 'DELETE'
+            }).always(function () {
+                location.reload(true)
+            })
+        }
+
+        //This setup is needed to let Django accept AJAX requests from this page by setting up the CSRF token correctly
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        });
     </script>
 	</body>
 </html>
