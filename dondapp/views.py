@@ -36,6 +36,8 @@ class SearchView(Resource):
             return HttpResponseBadRequest("No query given")
         query = request.GET['query']
         data = {
+            # Q allows for complex queries, this is equivalent to:
+            # SELECT * FROM dondapp_deal WHERE title LIKE %query% OR description LIKE %query%;
             'deals': models.Deal.objects.filter(Q(title__contains=query) | Q(description__contains=query)),
             'query': query
         }
@@ -46,10 +48,6 @@ class DealView(Resource):
     def get(self, request, id):
         deal = models.Deal.objects.get(id=id)
         # Do not save this deal obj, its just used to populate the template's image src path
-        """if deal.image_path == '':
-            deal.image_path = path.join(settings.STATIC_URL, 'no-img.png')
-        else:
-            deal.image_path = path.join(settings.MEDIA_URL, deal.image_path)"""
         context = {
             'deal': deal,
             'comments': models.Comment.objects.filter(deal_id=id)
