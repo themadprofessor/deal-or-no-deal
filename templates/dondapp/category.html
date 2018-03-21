@@ -19,23 +19,32 @@
                 url: {% url 'cat_all' %},
                 method: "GET"
             }).done(function (response) {
-                for (var i = 0; i < response.length; i++) {
-                    var category = response[i];
-                    var node = document.createElement("li");
-                    var text = document.createTextNode(category.name);
-					var cName = category.name;
-                    node.className += `filters ${cName}`;
+                for (let i = 0; i < response.length; i++) {
+                    let category = response[i];
+                    let node = document.createElement("li");
+                    let text = document.createTextNode(category.name);
+                    let cName = category.name.replace(/\s+/g, '_').toLowerCase();
+                    node.className += 'filters';
+                    node.id += cName;
                     node.appendChild(text);
                     document.getElementById('cat_list').appendChild(node);
-                    node.setAttribute("onclick", "get_deals(" + category.id + ")"); //Slight hack to keep category.id in args
+                    node.setAttribute("onclick", "get_deals(" + category.id + ', ' + cName + ")"); //Slight hack to keep category.id in args
                 }
-            })
-			get_deals(1);
+                get_deals(response[0].id, response[0].name.replace(/\s+/g, '_').toLowerCase())
+            });
         });
-        function get_deals(cat_id) {
+
+        function get_deals(cat_id, cat_name) {
             $.ajax({
                 url: {% url 'cat_all' %} + cat_id + "/deals"
             }).done(function (response) {
+                $('#cat_list').find('.active').removeClass('active');
+                if (typeof cat_name === "string") {
+                    $('#' + cat_name).addClass('active');
+                } else {
+                    $(cat_name).addClass('active');
+                }
+
                 var deals = $('#deals');
                 deals.html('');
                 if (response.length === 0) {
@@ -124,7 +133,7 @@
 
         function create_vote_button(upvote, deal) {
             var button = $('<button>',{
-                'html': "<i class='fas fas-chevron-" + (upvote?"up":"down") + "'></i>",
+                'html': "<i class='fas fa-chevron-" + (upvote?"up":"down") + "'></i>",
                 'class': 'vote_buttons btn btn-light'
             });
             button.click(function () {
