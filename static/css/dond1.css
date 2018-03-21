@@ -66,6 +66,15 @@ body {
     color: #4CAF50 !important;
 }
 
+.active > .nav-link {
+    color: #4CAF50 !important;
+}
+
+.btn.btn-link-outline {
+    color: white;
+    background-color: #333;
+}
+
 /* css for filter buttons */
 
 ul.filter-strip {
