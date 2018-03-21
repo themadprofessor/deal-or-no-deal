@@ -106,8 +106,8 @@
                         'class': 'card-text',
                         'html': response[i].description
                     });
-                    var upvote_button = create_vote_button(true, response[i].id);
-                    var downvote_button = create_vote_button(false, response[i].id);
+                    var upvote_button = create_upvote_button(true, response[i].id);
+                    var downvote_button = create_downvote_button(false, response[i].id);
 
                     vote_col.append(wrap_in_row(up_count), wrap_in_row(upvote_button), wrap_in_row(downvote_button), wrap_in_row(down_count));
                     title_row.append(title);
@@ -131,10 +131,37 @@
             return row;
         }
 
-        function create_vote_button(upvote, deal) {
+        function create_upvote_button(upvote, deal) {
             var button = $('<button>',{
-                'html': "<i class='fas fa-chevron-" + (upvote?"up":"down") + "'></i>",
-                'class': 'vote_buttons btn btn-light'
+                'html': "<i class='fas fa-chevron-" + ("up") + "'></i>",
+                'class': 'vote_buttons btn btn-light up_vote'
+            });
+            button.click(function () {
+                $.ajax({
+                    url: {% url 'vote' %},
+                    method: 'POST',
+                    data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }).done(function () {
+                    $.ajax({
+                        url: {% url 'vote' %},
+                        method: 'GET',
+                        data: {'deal_id': deal}
+                    }).done(function (response) {
+                        $('#upvote_count_'+deal).html(response['upvotes']);
+                        $('#downvote_count_'+deal).html(response['downvotes']);
+                    })
+                }).fail(function (response, status, error) {
+                    alert(error + "\n" + response.responseText)
+                })
+            });
+            return button;
+        }
+
+        function create_downvote_button(upvote, deal) {
+            var button = $('<button>',{
+                'html': "<i class='fas fa-chevron-" + ("down") + "'></i>",
+                'class': 'vote_buttons btn btn-light down_vote'
             });
             button.click(function () {
                 $.ajax({

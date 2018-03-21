@@ -13,24 +13,24 @@
                     <p id="upvote_count" style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
                 </div>
                 <div class="row">
-                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-up"></i></button>
+                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light up_vote"><i class="fas fa-chevron-up"></i></button>
                 </div>
                 <div class="row">
-                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-down"></i></button>
+                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light down_vote"><i class="fas fa-chevron-down"></i></button>
                 </div>
                 <div class="row aligm-items-center">
                     <p id="downvote_count" style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
                 </div>
             </div>
-            <div class="col">
+            <div class="col deal_image">
                 <img style="max-width: 7em; height: auto" src="{{ deal.image_path }}" alt="Deal image">
             </div>
             <div class="col">
                 <div class="row">
                     <h5>{{ deal.title }}</h5>
                 </div>
-                <div class="row justify-content-end align-items-end">
-                    <p>{{ deal.price }}</p>
+                <div class="row justify-content-end align-items-end deal_price">
+                    <p>£{{ deal.price }}</p>
                 </div>
                 {% if deal.url != '' %}
                 <div class="row">
@@ -91,8 +91,8 @@
                 <button type="button" onclick="send_comment()">Post</button>
             </div>
 
-            <div class="container" style="background-color:#3e4042">
-                <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:8em" onclick="close_comment()">Cancel</button>
+            <div class="container">
+                <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:100%" onclick="close_comment()">Cancel</button>
             </div>
         </form>
     </div>

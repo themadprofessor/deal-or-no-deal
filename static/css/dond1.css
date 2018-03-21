@@ -99,15 +99,9 @@ ul.filter-strip {
 	background-color: #111;
 	background-size: auto;
 	border: 4px solid;
+    border-color: white;
 	border-radius: 12px;
 	color: white;
-}
-
-#active {
-	background-color: #4CAF50;
-	color: white;
-	border: 4px solid;
-	border-radius: 12px;
 }
 
 button:focus{
@@ -191,15 +185,38 @@ span.psw {
 }
 
 
-/* css for the deal cards */
+/* css for the deal cards (category view)*/
 
-
-/* old */
-.deal-card {
-	margin: 1% auto;
-	width: 95%;
-	
+.card {
+    margin-top: 1em;
 }
+
+.card-title {
+    text-align-last: center;
+}
+
+.vote_buttons.btn.btn-light.up_vote:hover {
+    background-color: #4CAF50;
+}
+
+.vote_buttons.btn.btn-light.down_vote:hover {
+    background-color: #ff3a3a;
+}
+
+/* css for the deal cards (deal view) */
+
+.deal_price {
+    font-size: 32px;
+    padding-right: 2em;
+}
+
+.deal_image {
+    display: block;
+    margin: 0 auto;
+    
+}
+
+/* css for the comment and register model */
 
 #comment-model input[type=text] {
     width: 100%;
