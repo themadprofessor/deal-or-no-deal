@@ -11,16 +11,17 @@
         <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+       
 		<title>
 			Deal or No Deal -
 			{% block title_block %}
 			{% endblock %}
 		</title>
-
     </head>
+    
     <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{% url 'home' %}">Student Deals</a>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand active" href="{% url 'home' %}">Student Deals</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -33,17 +34,6 @@
                 <li id="nav_about" class="nav-item">
                     <a class="nav-link" href="{% url 'about' %}">About</a>
                 </li>
-                {% comment %}<li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>{% endcomment %}
             </ul>
 
             <div class="search-container">
@@ -54,7 +44,7 @@
             </div>
             {% if user.is_authenticated %}
                 <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-link-outline dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ user.username }}
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -70,36 +60,7 @@
         </div>
     </nav>
 
-    {% comment %}<nav>
-        <ul class="nav-strip-bar">
-            <li><a href="{% url 'home' %}" class="active" id="home-link">STUDENT DEALS</a></li>
-            <li id="other"><a href="{% url 'category' %}">Category</a></li>
-            <li id="other"><a href="{% url 'about' %}">About</a></li>
-            <li style="float:right">
-                {% if user.is_authenticated %}
-                    <div class="dropdown">
-                        <a href="#" class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown button
-                        </a>
-                        <div class="dropdown-menu" style="position: relative" role="menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </div>
-{#                    <button onclick="{% url 'logout' %}" class="login-button">Logout</button>#}
-                {% else %}
-                    <button onclick="open_login()" class="login-button">Login</button>
-                {% endif %}
-            </li>
-            <div class="search-container">
-                <form action="/action_page.php">
-                    <li><input type="text" placeholder="Search..." name="search"></li>
-                    <li><button type="submit"><i class="fa fa-search"></i></button></li>
-                </form>
-            </div>
-        </ul>
-    </nav>{% endcomment %}
+   
     <div>
         {% block body_block %}
         {% endblock %}
@@ -211,11 +172,12 @@
             return false;
         }
 
+        //Changes active link colour depending on which page is currently being viewed ***
         $(document).ready(function () {
             var loc = $(location).attr('pathname').split('/')[1];
-            $('#nav_' + loc).addClass('active');
+            $('.navbar' + loc).addClass('active');
         });
-
+        
         //This setup is needed to let Django accept AJAX requests from this page by setting up the CSRF token correctly
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {

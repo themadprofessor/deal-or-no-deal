@@ -7,49 +7,17 @@ body {
 
 /* css for the navigation bar */
 
-#home-link {
-	font-size: 20pt;
+.navbar.navbar-expand-lg.navbar-dark {
+    background-color: #333;
 }
 
-.nav-strip-bar {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-	background-color: #333;
-	top: 0;
-	width: 100%;
+.navbar-brand {
+    font-size: 24px;
+    color: white;
 }
 
-.nav-strip-bar li {
-	float: left;
-}
-
-.nav-strip-bar li a {
-	color: white;
-	font-size: 15pt;
-	display: inline-block;
-	padding: 0.5em 16px;
-	text-decoration: none;
-    text-align: center;
-}
-
-.nav-strip-bar li a:hover {
-	background-color: #111;
-}
-
-#other a {
-    padding: 0.9em 16px;
-}
-
-.other a:hover {
-	background-color: #111;
-    padding: 0.9em 16px;
-}
-
-.nav-strip-bar li a.active {
-	background-color: #4CAF50;
-	color: white;
+.navbar-dark .navbar-nav .nav-link {
+    color: white;
 }
 
 .search-container {
@@ -58,7 +26,6 @@ body {
 
 .search-container input[type=text] {
 	padding: 6px;
-	margin-top: 12px;
 	font-size: 17px;
 	border: none;
 }
@@ -66,7 +33,6 @@ body {
 .search-container button {
 	float: right;
 	padding: 6px 10px;
-	margin-top: 12px;
 	margin-right: 16px;
 	background: #ddd;
 	font-size: 17px;
@@ -78,24 +44,27 @@ body {
 	background: #ccc;
 }
 
-
-/* css for the login button */
-
-.login-button {
-	display: block;
-    border: none;
-    background-color: #333;
-    padding: 1.2em 16px;
-    font-size: 17px;
-    cursor: pointer;
-    text-align: center;
-    color: white;
+.btn.btn-link-outline.dropdown-toggle {
+     background-color: #333; 
+     color: white;
 }
 
-.login-button:hover {
-	background-color: #111;
+.dropdown-menu.dropdown-menu-right {
+    right: 0;
+    left: auto;
 }
 
+.btn.btn-link-outline.dropdown-toggle:hover {
+    background-color: #111;
+}
+
+.dropdown-item:hover {
+    background-color: #e6e6e6;
+}
+
+.active {
+    color: #4CAF50 !important;
+}
 
 /* css for filter buttons */
 
@@ -215,6 +184,8 @@ span.psw {
 
 /* css for the deal cards */
 
+
+/* old */
 .deal-card {
 	margin: 1% auto;
 	width: 95%;

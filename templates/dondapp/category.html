@@ -43,7 +43,7 @@
                     return
                 }
                 for (var i = 0; i < response.length; i++) {
-                    /* Produces the following:
+                    /* Produces the following: *
                     * <div class="card-deck>
                     *     <div class="card">
                     *         <div class="row">
@@ -91,7 +91,7 @@
                     var title = $('<h5>', {
                         'class': 'card-title',
                         'html': ('<a href="' + '{% url 'deal' id=1 %}' + '">' + response[i].title + "</a>").replace("1", response[i].id)
-                        {# Build deal url by replacing 1 with this deal's id #}
+                        {# Build deal url by replacing 1 with this deals id #}
                     });
                     var description = $('<p>', {
                         'class': 'card-text',
