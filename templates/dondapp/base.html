@@ -175,7 +175,7 @@
         //Changes active link colour depending on which page is currently being viewed ***
         $(document).ready(function () {
             var loc = $(location).attr('pathname').split('/')[1];
-            $('.navbar' + loc).addClass('active');
+            $('#nav_' + loc).addClass('active');
         });
         
         //This setup is needed to let Django accept AJAX requests from this page by setting up the CSRF token correctly
