@@ -38,7 +38,7 @@ def populate():
     comments = [{"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)), "desc": "haHAA"},
                 {"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)), "desc": "lMAO"},
                 {"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)), "desc": "eyyyyyy"},
-                {"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)), "desc": "goodshit"},
+                {"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)), "desc": "good stuff`"},
                 {"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)), "desc": "w0w"},
                 {"userid": RNG.randint(1, len(deals)), "dealid": RNG.randint(1, len(deals)),
                  "desc": "u find good deal"},
