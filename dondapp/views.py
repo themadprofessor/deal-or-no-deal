@@ -54,12 +54,23 @@ class DealView(Resource):
         return render(request, 'dondapp/deal.html', context=context)
 
 
-class AllDealView(Resource):
+class NewDealView(Resource):
     def get(self, request):
         deals = models.Deal.objects.all()
         data = []
         for deal in deals:
             data.append(deal.to_dict())
+        data = sorted(data, key=lambda x:x["creation_date"])
+        return HttpResponse(json.dumps(data), status=200, content_type="application/json")
+        
+        
+class TopDealView(Resource):
+    def get(self, request):
+        deals = models.Deal.objects.all()
+        data = []
+        for deal in deals:
+            data.append(deal.to_dict())
+        data = sorted(data, key=lambda x:x["upvotes"],reverse=True)
         return HttpResponse(json.dumps(data), status=200, content_type="application/json")
 
 

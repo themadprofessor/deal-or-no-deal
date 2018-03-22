@@ -7,8 +7,8 @@
 
 {% block body_block %}
 	<ul class="filter-strip">
-		<button class="filters" id="active">New</li>
-		<button class="filters">Top</li>
+		<button class="filters active" id="new" onclick="get_deals('new')">New</li>
+		<button class="filters" id="top" onclick="get_deals('top')">Top</li>
 	</ul>
 
     <div id='deals' class="container">
@@ -19,14 +19,20 @@
     <script type="application/javascript">
         $(document).ready(function () {
         	console.log("AYYYYYYYYYY");
-            $.ajax({
-                url: {% url 'all_deals' %},
+			get_deals("new");            
+        })
+		
+		function get_deals(type){
+			$('.filter-strip').find('.active').removeClass('active');
+			$('#'+type).addClass('active');
+			$.ajax({
+                url: type=="new" ? {% url "new_deals" %}:{% url "top_deals" %},
                 method: "GET"
             }).done(function (response) {
                 var deals = $('#deals');
                 deals.html('');
                 for (var i = 0; i < response.length; i++) {
-                    let deal = response[i];	
+                    var deal = response[i];	
                     var deck = $('<div>', {'class': 'card-deck'});
                     var card = $('<div>', {'class': 'card'});
                     var card_body = $('<div>', {'class': 'card_body'});
@@ -65,9 +71,8 @@
                     deck.append(card);
                     deals.append(deck);
                 }
-            })
-        })
-
+            })}
+		
         function wrap_in_row(obj) {
             obj.css({'float': 'none', 'margin': '0 auto'});
             var row = $('<div>', {

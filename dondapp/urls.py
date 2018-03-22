@@ -14,5 +14,6 @@ urlpatterns = [
     path('user/<str:username>', views.UserView.dispatch, name='user_profile'),
     path('comment/', views.CommentView.dispatch, name='comment'),
     path('comment/<int:id>', views.CommentView.dispatch, name='comment_id'),
-    path('alldeals/', views.AllDealView.dispatch, name='all_deals')
+    path('newdeals/', views.NewDealView.dispatch, name='new_deals'),
+    path('topdeals/', views.TopDealView.dispatch, name='top_deals')
 ]
