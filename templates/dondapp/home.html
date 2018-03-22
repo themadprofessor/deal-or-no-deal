@@ -7,12 +7,128 @@
 
 {% block body_block %}
 	<ul class="filter-strip">
-		<button class="filters" id="active" >Best</li>
+		<button class="filters" id="active">New</li>
 		<button class="filters">Top</li>
-		<button class="filters">New</li>
 	</ul>
 
-	
-	  
+    <div id='deals' class="container">
+    	<ul id='deal_list'>
+    	</ul>
+    </div>
 
+    <script type="application/javascript">
+        $(document).ready(function () {
+        	console.log("AYYYYYYYYYY");
+            $.ajax({
+                url: {% url 'all_deals' %},
+                method: "GET"
+            }).done(function (response) {
+                var deals = $('#deals');
+                deals.html('');
+                for (var i = 0; i < response.length; i++) {
+                    let deal = response[i];	
+                    var deck = $('<div>', {'class': 'card-deck'});
+                    var card = $('<div>', {'class': 'card'});
+                    var card_body = $('<div>', {'class': 'card_body'});
+                    var row = $('<div>', {'class': 'row'});
+                    var vote_col = $('<div>', {'class': 'col-sm-1'});
+                    var info_col = $('<div>', {'class': 'col'});
+                    var title_row = $('<div>', {'class': 'row'});
+                    var desc_row = $('<div>', {'class': 'row'});
+                    var up_count = $('<p>', {
+                        'html': response[i].upvotes,
+                        'id': "upvote_count_" + response[i].id
+                    });
+                    var down_count = $('<p>', {
+                        'html': response[i].downvotes,
+                        'id': "downvote_count_" + response[i].id
+                    });
+                    var title = $('<h5>', {
+                        'class': 'card-title',
+                        'html': ('<a href="' + '{% url 'deal' id=1 %}' + '">' + response[i].title + "</a>").replace("1", response[i].id)
+                        {# Build deal url by replacing 1 with this deals id #}
+                    });
+                    var description = $('<p>', {
+                        'class': 'card-text',
+                        'html': response[i].description
+                    });
+                    var upvote_button = create_upvote_button(true, response[i].id);
+                    var downvote_button = create_downvote_button(false, response[i].id);
+
+                    vote_col.append(wrap_in_row(up_count), wrap_in_row(upvote_button), wrap_in_row(downvote_button), wrap_in_row(down_count));
+                    title_row.append(title);
+                    desc_row.append(description);
+                    info_col.append(title_row, desc_row);
+                    row.append(vote_col, info_col);
+                    card_body.append(row);
+                    card.append(card_body);
+                    deck.append(card);
+                    deals.append(deck);
+                }
+            })
+        })
+
+        function wrap_in_row(obj) {
+            obj.css({'float': 'none', 'margin': '0 auto'});
+            var row = $('<div>', {
+                'class': 'row align-items-center'
+            });
+            row.append(obj);
+            return row;
+        }
+
+        function create_upvote_button(upvote, deal) {
+            var button = $('<button>',{
+                'html': "<i class='fas fa-chevron-" + ("up") + "'></i>",
+                'class': 'vote_buttons btn btn-light up_vote'
+            });
+            button.click(function () {
+                $.ajax({
+                    url: {% url 'vote' %},
+                    method: 'POST',
+                    data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }).done(function () {
+                    $.ajax({
+                        url: {% url 'vote' %},
+                        method: 'GET',
+                        data: {'deal_id': deal}
+                    }).done(function (response) {
+                        $('#upvote_count_'+deal).html(response['upvotes']);
+                        $('#downvote_count_'+deal).html(response['downvotes']);
+                    })
+                }).fail(function (response, status, error) {
+                    alert(error + "\n" + response.responseText)
+                })
+            });
+            return button;
+        }
+
+        function create_downvote_button(upvote, deal) {
+            var button = $('<button>',{
+                'html': "<i class='fas fa-chevron-" + ("down") + "'></i>",
+                'class': 'vote_buttons btn btn-light down_vote'
+            });
+            button.click(function () {
+                $.ajax({
+                    url: {% url 'vote' %},
+                    method: 'POST',
+                    data: JSON.stringify({'deal_id': deal, 'upvote': upvote}),
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }).done(function () {
+                    $.ajax({
+                        url: {% url 'vote' %},
+                        method: 'GET',
+                        data: {'deal_id': deal}
+                    }).done(function (response) {
+                        $('#upvote_count_'+deal).html(response['upvotes']);
+                        $('#downvote_count_'+deal).html(response['downvotes']);
+                    })
+                }).fail(function (response, status, error) {
+                    alert(error + "\n" + response.responseText)
+                })
+            });
+            return button;
+        }
+    </script>
 {% endblock %}
