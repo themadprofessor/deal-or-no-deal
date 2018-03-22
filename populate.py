@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE',
                       'deal_or_no_deal.settings')
