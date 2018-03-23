@@ -153,6 +153,8 @@ class Deal(models.Model):
     image_path = models.URLField(default=settings.STATIC_URL + "no-img.png")
     url = models.URLField(blank=True)
 
+    REQUIRED = ['category_id', 'user_id', 'title', 'description', 'price']
+
     def __str__(self):
         return self.title
 

@@ -43,6 +43,7 @@
                 </form>
             </div>
             {% if user.is_authenticated %}
+                <button onclick="open_deal()" class="btn btn-link-outline">New Deal</button>
                 <div class="dropdown">
                     <button class="btn btn-link-outline dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ user.username }}
@@ -120,6 +121,39 @@
             </div>
         </form>
     </div>
+    {% else %}
+        <div id="deal-model" class="model">
+            <form id="deal-form" class="model-content" action="{% url 'deals' %}" method="post">
+                {% csrf_token %}
+                <div class="container">
+                    <label for="deal-category"><b>Category</b></label>
+                    <br>
+                    <select name="category_id" id="deal-category" required>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <br>
+                    <label for="title"><b>Title</b></label>
+                    <input class="form-text-input" type="Text" placeholder="Title" name="title" required>
+
+                    <label for="description"><b>Description</b></label>
+                    <textarea style="width: 100%" class="form-text-input" placeholder="Description" name="description" required></textarea>
+
+                    <label for="price"><b>Price</b></label>
+                    <input id="price" class="form-text-input" type="number" name="price" step="0.01" required>
+
+                    <input type="hidden" name="user_id" value="{{ user.username }}">
+
+                    <button type="button" onclick="post_deal()">Post</button>
+                </div>
+
+                <div class="container">
+                    <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:100%" onclick="close_deal()">Cancel</button>
+                </div>
+            </form>
+        </div>
     {% endif %}
 
     <script type="application/javascript">
@@ -147,12 +181,36 @@
             model.style.opacity = "0";
         }
 
+        function open_deal() {
+            var model = document.getElementById("deal-model");
+            model.style.zIndex = "1";
+            model.style.opacity = "1";
+        }
+
+        function close_deal() {
+            var model = document.getElementById("deal-model");
+            model.style.zIndex = "-999";
+            model.style.opacity = "0";
+        }
+
         function logout() {
             $.ajax({
                 url: {% url 'login' %},
                 method: 'DELETE'
             }).always(function () {
                 location.href = "{% url 'home' %}";
+            })
+        }
+
+        function post_deal() {
+            $.ajax({
+                url: {% url 'deals' %},
+                method: 'POST',
+                data: $('#deal-form').serialize()
+            }).done(function () {
+                location.reload(true);
+            }).fail(function (response) {
+                alert(response.responseText)
             })
         }
 
@@ -165,7 +223,7 @@
             }).fail(function () {
                 form.submit();
             }).done(function () {
-                var alert = $('#register-alert');
+                const alert = $('#register-alert');
                 alert.html('Username is taken');
                 alert.alert();
             });

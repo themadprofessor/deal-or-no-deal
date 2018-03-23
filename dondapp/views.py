@@ -3,11 +3,21 @@ import json
 import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from django.shortcuts import redirect, get_object_or_404, render
+from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
+from django.shortcuts import render as django_render
 
 from dondapp import models
 from .router import Resource, auth_required
+
+
+def render(request, *args, **kwargs):
+    if request.user.is_authenticated:
+        context = kwargs.get('context', {})
+        if 'categories' not in context:
+            context['categories'] = models.Category.objects.all()
+            kwargs['context'] = context
+    return django_render(request, *args, **kwargs)
 
 
 class HomeView(Resource):
@@ -52,6 +62,23 @@ class DealView(Resource):
             'comments': models.Comment.objects.filter(deal_id=id)
         }
         return render(request, 'dondapp/deal.html', context=context)
+
+    def post(self, request):
+        print(request.POST)
+        for required in models.Deal.REQUIRED:
+            if required not in request.POST:
+                return HttpResponseBadRequest(required + ' not specified')
+
+        if not models.Category.objects.filter(id=request.POST['category_id']).exists():
+            return HttpResponse('Category not found', status=404)
+        if not models.User.objects.filter(username=request.POST['user_id']).exists():
+            return HttpResponse('User not found', status=404)
+
+        deal = models.Deal(category_id=models.Category.objects.get(id=request.POST['category_id']), user_id=models.User.objects.get(username=request.POST['user_id']),
+                           title=request.POST['title'], description=request.POST['description'],
+                           price=request.POST['price'])
+        deal.save()
+        return HttpResponse(status=200)
 
 
 class NewDealView(Resource):
