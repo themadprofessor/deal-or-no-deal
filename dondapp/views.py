@@ -79,7 +79,7 @@ class DealView(Resource):
                            title=request.POST['title'], description=request.POST['description'],
                            price=request.POST['price'])
         deal.save()
-        deal.upvoters.filter(username=user.username).exists()
+        deal.upvoters.filter(username=request.user.username).exists()
         return HttpResponse(status=200)
 
 
