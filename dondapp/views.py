@@ -56,10 +56,11 @@ class SearchView(Resource):
 class DealView(Resource):
     def get(self, request, id):
         deal = get_object_or_404(models.Deal, id=id)
-        # Do not save this deal obj, its just used to populate the template's image src path
         context = {
             'deal': deal,
-            'comments': models.Comment.objects.filter(deal_id=id)
+            'comments': models.Comment.objects.filter(deal_id=id),
+            'upvoters': deal.upvoters.values_list('username', flat=True),
+            'downvoters': deal.downvoters.values_list('username', flat=True)
         }
         return render(request, 'dondapp/deal.html', context=context)
 
@@ -78,6 +79,7 @@ class DealView(Resource):
                            title=request.POST['title'], description=request.POST['description'],
                            price=request.POST['price'])
         deal.save()
+        deal.upvoters.filter(username=user.username).exists()
         return HttpResponse(status=200)
 
 
@@ -236,8 +238,10 @@ class VoteView(Resource):
         deal = get_object_or_404(models.Deal, id=data['deal_id'])
         if data['upvote']:
             deal.upvotes += 1
+            deal.upvoters.add(request.user)
         else:
             deal.downvotes += 1
+            deal.downvoters.add(request.user)
 
         deal.save()
         return HttpResponse(status=200)

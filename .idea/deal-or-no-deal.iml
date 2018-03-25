@@ -15,7 +15,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6 (deal_or_no_deal)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.6 (deal-or-no-deal)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="jquery-1.11.1" level="application" />

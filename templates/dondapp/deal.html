@@ -13,10 +13,18 @@
                     <p id="upvote_count" style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
                 </div>
                 <div class="row">
-                    <button onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light up_vote"><i class="fas fa-chevron-up"></i></button>
+                    {% if user.username in upvoters %}
+                        <button style="float: none; margin: 0 auto; background: #4CAF50" class="vote_buttons btn btn-light up_vote"><i class="fas fa-chevron-up"></i></button>
+                    {% else %}
+                        <button id="upvote-but" onclick="send_vote({{ deal.id }}, true)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light up_vote"><i class="fas fa-chevron-up"></i></button>
+                    {% endif %}
                 </div>
                 <div class="row">
-                    <button onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light down_vote"><i class="fas fa-chevron-down"></i></button>
+                    {% if user.username in downvoters %}
+                        <button style="float: none; margin: 0 auto; background: #ff3a3a;" class="vote_buttons btn btn-light down_vote"><i class="fas fa-chevron-down"></i></button>
+                    {% else %}
+                        <button id="downvote-but" onclick="send_vote({{ deal.id }}, false)" style="float: none; margin: 0 auto" class="vote_buttons btn btn-light down_vote"><i class="fas fa-chevron-down"></i></button>
+                    {% endif %}
                 </div>
                 <div class="row aligm-items-center">
                     <p id="downvote_count" style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
@@ -138,6 +146,13 @@
                 }).done(function (response) {
                     $('#upvote_count').html(response['upvotes']);
                     $('#downvote_count').html(response['downvotes']);
+                    if (upvote) {
+                        $('#upvote-but').setAttribute("onclick", "");
+                        $('#upvote-but').css('background-color', '#4CAF50"');
+                    } else {
+                        $('#downvote-but').setAttribute("onclick", "");
+                        $('#downvote-but').css('background-color', '#ff3a3a"');
+                    }
                 })
             }).fail(function (response, status, error) {
                 alert(error + "\n" + response.responseText)

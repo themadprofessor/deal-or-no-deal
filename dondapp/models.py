@@ -152,6 +152,8 @@ class Deal(models.Model):
     downvotes = models.IntegerField(default=0)
     image_path = models.URLField(default=settings.STATIC_URL + "no-img.png")
     url = models.URLField(blank=True)
+    upvoters = models.ManyToManyField(User, related_name='upvoters')
+    downvoters = models.ManyToManyField(User, related_name='downvoters')
 
     REQUIRED = ['category_id', 'user_id', 'title', 'description', 'price']
 
@@ -172,5 +174,5 @@ class Deal(models.Model):
             'creation_date': self.creation_date.timestamp(),
             'upvotes': self.upvotes,
             'downvotes': self.downvotes,
-            'image_path': self.image_path
+            'image_path': self.image_path,
         }
