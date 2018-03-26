@@ -1,6 +1,8 @@
 import json
 
 import datetime
+
+import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
@@ -111,7 +113,7 @@ class CommentView(Resource):
         if 'id' not in request.GET:
             return HttpResponseBadRequest("No id given")
         comment = models.Comment.objects.get(id=request.GET['id'])
-        return HttpResponse(comment.to_json(), status=200)
+        return HttpResponse(comment.to_json(), status=200, content_type='application/json')
 
     @auth_required
     def post(self, request):
@@ -123,7 +125,7 @@ class CommentView(Resource):
             return HttpResponse("Deal not found", status=404)
 
         comment = models.Comment(deal_id=models.Deal.objects.get(id=request.POST['deal_id']),
-                                 user_id=request.user, creation_date=datetime.datetime.now(),
+                                 user_id=request.user, creation_date=pytz.utc.localize(datetime.datetime.now()),
                                  content=request.POST['content'])
         comment.save()
         return HttpResponse(status=200)

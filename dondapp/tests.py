@@ -1,3 +1,5 @@
+import datetime
+import pytz
 from django.db.models import Q
 
 from dondapp import models
@@ -126,6 +128,16 @@ class DealViewTest(BaseTestCases.ResourceTestCase):
         mc_deal.downvoters.set([user2])
         kfc_deal.upvoters.set([user, user2])
 
+    @classmethod
+    def tearDownClass(cls):
+        for deal in models.Deal.objects.filter(Q(title='McDonalds Deal') | Q(title='KFC')):
+            deal.delete()
+        for category in models.Category.objects.filter(name='Food'):
+            category.delete()
+        for user in models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')):
+            user.delete()
+        super().tearDownClass()
+
     def test_get_empty(self):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
@@ -174,3 +186,104 @@ class DealViewTest(BaseTestCases.ResourceTestCase):
             'price': 0.0
         })
         self.assertEqual(response.status_code, 404, 'Should fail when given invalid user')
+
+
+class NewDealViewTest(BaseTestCases.ResourceTestCase):
+    path = '/newdeals/'
+
+    def test_get(self):
+        response = self.client.get(self.path)
+        json = response.json()
+        self.assertEqual(json, sorted(json, key=lambda x: x["creation_date"]))
+
+
+class TopDealViewTest(BaseTestCases.ResourceTestCase):
+    path = '/topdeals/'
+
+    def test_get(self):
+        response = self.client.get(self.path)
+        json = response.json()
+        self.assertEqual(json, sorted(json, key=lambda x: x["upvotes"], reverse=True))
+
+
+class CommentViewTest(BaseTestCases.ResourceTestCase):
+    path = '/comment/'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        user = models.User.objects.create_user("johnsmith", "John", "Smith", "john@smith.com", "abcdefghi123")
+        user2 = models.User.objects.create_user("joeblogs", "Joe", "Blogs", "joe@blogs.com", "abcdefghi123")
+        category = models.Category.objects.create(name="Food", description="Food based deals")
+        mc_deal = models.Deal.objects.create(category_id=category, user_id=user, title="McDonalds Deal",
+                                             description="Free Cheeseburger with saver meal", price=0.0)
+        models.Comment.objects.create(deal_id=mc_deal, user_id=user, content='Quality Deal M8',
+                                      creation_date=pytz.utc.localize(datetime.datetime.now()))
+        models.Comment.objects.create(deal_id=mc_deal, user_id=user2, content='Quality Deal M8',
+                                      creation_date=pytz.utc.localize(datetime.datetime.now()))
+
+    @classmethod
+    def tearDownClass(cls):
+        for comment in models.Comment.objects.filter(content__contains='M8'):
+            comment.delete()
+        for deal in models.Deal.objects.filter(title='McDonalds Deal'):
+            deal.delete()
+        for category in models.Category.objects.filter(name='Food'):
+            category.delete()
+        for user in models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')):
+            user.delete()
+        super().tearDownClass()
+
+    def test_get_none(self):
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 400, 'Should fail if not given comment id')
+
+    def test_get(self):
+        response = self.client.get(self.path, data={'id': 1})
+        json = response.json()
+        self.assertEqual(json['deal_id'], 1)
+        self.assertEqual(json['user_id'], 'johnsmith')
+        self.assertEqual(json['content'], 'Quality Deal M8')
+
+    def test_post_unauth(self):
+        response = self.client.post(self.path)
+        self.assertEqual(response.status_code, 401, "Unauthorised user shouldn't be able to comment")
+
+    def test_post(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        comment_data = {
+            'deal_id': 1,
+            'user_id': 'joeblogs',
+            'creation_date': str(pytz.utc.localize(datetime.datetime.now())),
+            'content': 'CONTENT GOES HERE'
+        }
+        response = self.client.post(self.path, data=comment_data)
+        self.assertEqual(response.status_code, 200)
+        comment = models.Comment.objects.filter(content='CONTENT GOES HERE')
+        self.assertTrue(comment is not None)
+        comment.delete()
+        self.client.logout()
+
+    def test_delete_unauth(self):
+        response = self.client.delete(self.path + '1/')
+        self.assertEqual(response.status_code, 401, 'Unauthorised users should not be able to delete comments')
+
+    def test_delete(self):
+        comment = models.Comment.objects.create(deal_id=models.Deal.objects.get(id=1),
+                                                user_id=models.User.objects.get(username='joeblogs'),
+                                                content='Best dealo', creation_date=pytz.utc.localize(datetime.datetime.now()))
+        self.client.login(username='joeblogs', password='abcdefghi123')
+        response = self.client.delete(self.path + str(comment.id) + '/')
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(models.Comment.objects.filter(content='Best dealo').exists())
+        self.client.logout()
+
+    def test_delete_forbid(self):
+        comment = models.Comment.objects.create(deal_id=models.Deal.objects.get(id=1),
+                                                user_id=models.User.objects.get(username='johnsmith'),
+                                                content='Best dealo', creation_date=pytz.utc.localize(datetime.datetime.now()))
+        self.client.login(username='joeblogs', password='abcdefghi123')
+        response = self.client.delete(self.path + str(comment.id) + '/')
+        self.assertEqual(response.status_code, 403)
+        comment.delete()
+        self.client.logout()

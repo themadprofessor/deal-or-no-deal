@@ -70,9 +70,9 @@ class Comment(models.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'deal_id': self.deal_id,
-            'user_id': self.user_id,
-            'creation_date': self.creation_date,
+            'deal_id': self.deal_id.id,
+            'user_id': self.user_id.username,
+            'creation_date': str(self.creation_date),
             'content': self.content
         }
 
