@@ -1,13 +1,20 @@
+from django.db.models import Q
+
 from dondapp import models
+
 from django.test import TestCase
 
 
 # Create your tests here.
 class BaseTestCases:
     class ResourceTestCase(TestCase):
+        @classmethod
+        def setUpClass(cls):
+            super().setUpClass()
+
         def test_get(self):
-                response = self.client.get(self.path)
-                self.assertEqual(response.status_code, 405, 'Should not support GET method')
+            response = self.client.get(self.path)
+            self.assertEqual(response.status_code, 405, 'Should not support GET method')
 
         def test_post(self):
             response = self.client.post(self.path)
@@ -63,7 +70,9 @@ class FailedView(BaseTestCases.ResourceTestCase):
 class SearchView(BaseTestCases.ResourceTestCase):
     path = '/search/'
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         user = models.User.objects.create_user("johnsmith", "John", "Smith", "john@smith.com", "abcdefghi123")
         category = models.Category.objects.create(name="Food", description="Food based deals")
         models.Deal.objects.create(category_id=category, user_id=user, title="McDonalds Deal",
@@ -79,3 +88,89 @@ class SearchView(BaseTestCases.ResourceTestCase):
         response = self.client.get(self.path, data={'query': 'burger'})
         self.assertContains(response, 'Free Cheeseburger with saver meal', status_code=200)
 
+    def test_get_none(self):
+        response = self.client.get(self.path, data={'query': 'hotdog'})
+        self.assertNotContains(response, 'Free Cheeseburger with saver meal', status_code=200)
+        self.assertNotContains(response, 'Free Wing with saver meal', status_code=200)
+
+    def test_get_both(self):
+        response = self.client.get(self.path, data={'query': 'Free'})
+        self.assertContains(response, 'Free Cheeseburger with saver meal', status_code=200)
+        self.assertContains(response, 'Free Wing with saver meal', status_code=200)
+
+    @classmethod
+    def tearDownClass(cls):
+        for deal in models.Deal.objects.filter(Q(title__contains='McDonalds') | Q(title__contains='KFC')):
+            deal.delete()
+        for category in models.Category.objects.filter(name='Food'):
+            category.delete()
+        for user in models.User.objects.filter(username='johnsmith'):
+            user.delete()
+        super().tearDownClass()
+
+
+class DealViewTest(BaseTestCases.ResourceTestCase):
+    path = '/deal/'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        user = models.User.objects.create_user("johnsmith", "John", "Smith", "john@smith.com", "abcdefghi123")
+        user2 = models.User.objects.create_user("joeblogs", "Joe", "Blogs", "joe@blogs.com", "abcdefghi123")
+        category = models.Category.objects.create(name="Food", description="Food based deals")
+        mc_deal = models.Deal.objects.create(category_id=category, user_id=user, title="McDonalds Deal",
+                                             description="Free Cheeseburger with saver meal", price=0.0)
+        kfc_deal = models.Deal.objects.create(category_id=category, user_id=user2, title="KFC",
+                                              description="Free Wing with saver meal", price=0.0)
+        mc_deal.upvoters.set([user])
+        mc_deal.downvoters.set([user2])
+        kfc_deal.upvoters.set([user, user2])
+
+    def test_get_empty(self):
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 404)
+
+    def test_get(self):
+        response = self.client.get(self.path + '1/')
+        self.assertContains(response, 'Free Cheeseburger')
+
+    def test_post(self):
+        response = self.client.post(self.path, data={
+            'category_id': models.Category.objects.all()[0].id,
+            'user_id': 'johnsmith',
+            'title': 'New Deal',
+            'description': 'New Deal',
+            'price': 0.0
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(len(models.Deal.objects.filter(title='New Deal')), 1, 'Failed to create deal')
+        for deal in models.Deal.objects.filter(title='New Deal'):
+            deal.delete()
+
+    def test_post_missing(self):
+        response = self.client.post(self.path, data={
+            'category_id': models.Category.objects.all()[0].id,
+            'user_id': 'johnsmith',
+            'title': 'New Deal',
+            'price': 0.0
+        })
+        self.assertEqual(response.status_code, 400, 'Should fail when given incomplete deal')
+
+    def test_post_not_found(self):
+        response = self.client.post(self.path, data={
+            'category_id': 999,
+            'user_id': 'johnsmith',
+            'title': 'New Deal',
+            'description': 'New Deal',
+            'price': 0.0
+        })
+        self.assertEqual(response.status_code, 404, 'Should fail when given invalid category')
+
+        response = self.client.post(self.path, data={
+            'category_id': models.Category.objects.all()[0].id,
+            'user_id': 'NOT REAL USER NAME',
+            'title': 'New Deal',
+            'description': 'New Deal',
+            'price': 0.0
+        })
+        self.assertEqual(response.status_code, 404, 'Should fail when given invalid user')

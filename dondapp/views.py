@@ -54,8 +54,11 @@ class SearchView(Resource):
 
 
 class DealView(Resource):
-    def get(self, request, id):
-        deal = get_object_or_404(models.Deal, id=id)
+    def get(self, request, id=None):
+        try:
+            deal = models.Deal.objects.get(id=id)
+        except models.Deal.DoesNotExist:
+            return HttpResponse('Deal not found', status=404)
         context = {
             'deal': deal,
             'comments': models.Comment.objects.filter(deal_id=id),
