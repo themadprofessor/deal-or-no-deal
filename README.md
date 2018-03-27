@@ -24,8 +24,11 @@ Install dependencies
 Setup and populate database
 
 `python manage.py makemigrations dondapp`
+
 `python manage.py makemigrations`
+
 `python manage.py`
+
 `python populate_script.py`
 
 ### Running server
