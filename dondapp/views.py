@@ -329,7 +329,8 @@ class LoginView(Resource):
     @auth_required
     def delete(self, request):
         """Logout the user in the given given request"""
-        return logout(request)
+        logout(request)
+        return HttpResponse(status=200)
 
 
 class VoteView(Resource):

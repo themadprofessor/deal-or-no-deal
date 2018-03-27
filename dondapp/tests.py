@@ -410,3 +410,51 @@ class UserView(BaseTestCases.ResourceTestCase):
         }
         response = self.client.post(self.path, data=data)
         self.assertEqual(response.status_code, 400, 'Should fail on invalid request')
+
+
+class LoginViewTest(BaseTestCases.ResourceTestCase):
+    path = '/login/'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        models.User.objects.create_user("johnsmith", "John", "Smith", "john@smith.com", "abcdefghi123")
+
+    @classmethod
+    def tearDownClass(cls):
+        models.User.objects.get(username='johnsmith').delete()
+        super().tearDownClass()
+
+    def test_delete(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        response = self.client.delete(self.path)
+        self.assertEqual(response.status_code, 200, 'Should not fail')
+
+    def test_delete_unauth(self):
+        response = self.client.delete(self.path)
+        self.assertEqual(response.status_code, 401, 'Should not allow unauthenticated users to logout')
+
+    def test_post(self):
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+            'password': 'abcdefghi123'
+        })
+        self.assertTrue(300 < response.status_code < 304, 'Should redirect')
+        self.assertEqual(response['Location'], '/', 'Should redirect to home')
+        self.assertTrue(response.request.user.is_authenticated, 'Failed to log user in')
+        self.client.logout()
+
+    def test_post_bad(self):
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+        })
+        self.assertEqual(response.status_code, 400, 'Should not allow invalid requests')
+
+    def test_post_invalid(self):
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+            'password': 'NOT CORRECT PASSWORD'
+        })
+        self.assertTrue(300 < response.status_code < 304, 'Should redirect')
+        self.assertEqual(response['Location'], '/failed/', 'Should redirect to failed')
+        self.assertFalse(response.request.user.is_authenticated, 'User should not be logged in on failed login')
