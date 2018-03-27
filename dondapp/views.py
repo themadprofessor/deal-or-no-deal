@@ -249,7 +249,7 @@ class UserView(Resource):
                 return HttpResponse('User not found', status=404)
 
             user = models.User.objects.get(username=request.GET['username'])
-            return HttpResponse(user.to_json(), status=200)
+            return HttpResponse(user.to_json(), status=200, content_type='application/json')
 
     def post(self, request):
         """
@@ -273,7 +273,8 @@ class UserView(Resource):
                 # Update existing user
                 user = models.User.objects.get(username=request.POST['username'])
                 for attr in models.User.UPDATEABLE:
-                    setattr(user, attr, request.POST[attr])
+                    if attr in request.POST:
+                        setattr(user, attr, request.POST[attr])
 
                 # Only let superuser's change authority
                 user.authority = request.POST.get('authority', user.authority) if user.is_superuser else user.authority
@@ -288,9 +289,6 @@ class UserView(Resource):
                 for required in models.User.REQUIRED:
                     if required not in request.POST:
                         return HttpResponseBadRequest(required + " not specified")
-
-                if models.User.objects.filter(username=request.POST['username']).exists():
-                    return HttpResponseBadRequest("Username is taken")
 
                 user = models.User.objects.create_user(request.POST['username'], request.POST['first_name'],
                                                        request.POST['last_name'], request.POST['email'],

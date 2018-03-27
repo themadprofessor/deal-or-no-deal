@@ -10,6 +10,8 @@ from django.test import TestCase
 # Create your tests here.
 class BaseTestCases:
     class ResourceTestCase(TestCase):
+        """Base test case for resources. Subclasses should overwrite methods which are supported by the endpoint"""
+
         @classmethod
         def setUpClass(cls):
             super().setUpClass()
@@ -304,25 +306,107 @@ class UserView(BaseTestCases.ResourceTestCase):
             user.delete()
         super().tearDownClass()
 
-    def get_profile(self):
+    def test_get_profile(self):
         response = self.client.get(self.path + 'johnsmith/')
-        self.assertContains(response, 'john@smith.com', 'Profile page should show the email of a user')
-        self.assertNotContains(response, 'abcdefghi123', ' Profile page should not show passwords')
+        self.assertContains(response, 'john@smith.com', msg_prefix='Profile page should show the email of a user')
+        self.assertNotContains(response, 'abcdefghi123', msg_prefix='Profile page should not show passwords')
 
-    def get_fake_profile(self):
+    def test_get_fake_profile(self):
         response = self.client.get(self.path + 'NOTREAL/')
         self.assertEqual(response.status_code, 404, 'Should fail to find user')
 
-    def get_none(self):
+    def test_get_none(self):
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 404, 'Should fail to find user')
+        self.assertEqual(response.status_code, 400, 'Should fail to find user')
 
-    def get_fake(self):
+    def test_get_fake(self):
         response = self.client.get(self.path, data={'username': 'NOTREAL'})
         self.assertEqual(response.status_code, 404, 'Should fail to find user')
 
-    def get(self):
+    def test_get(self):
         response = self.client.get(self.path, data={'username': 'johnsmith'})
         json = response.json()
         self.assertEqual(json['email'], 'john@smith.com', 'Failed to get correct user json')
         self.assertTrue('password' not in json)
+
+    def test_post_none(self):
+        response = self.client.post(self.path)
+        self.assertEqual(response.status_code, 400, 'Should fail when no username given')
+
+    def test_post(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+            'first_name': 'Super'
+        })
+        self.assertTrue(300 < response.status_code < 304, 'Should redirect')
+        self.assertEqual(response['Location'], '/', 'Should redirect to home')
+        user = models.User.objects.get(username='johnsmith')
+        self.assertEqual(user.first_name, 'Super')
+        user.first_name = 'John'
+        user.save()
+        self.client.logout()
+
+    def test_post_unauth(self):
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+            'first_name': 'Super'
+        })
+        self.assertEqual(response.status_code, 401, 'Should not allow unauthenticated users')
+        self.assertEqual(models.User.objects.get(username='johnsmith').first_name, 'John', 'Should not modify if unauthenticated')
+
+    def test_post_forbid(self):
+        self.client.login(username='joeblogs', password='abcdefhi123')
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+            'first_name': 'Super'
+        })
+        self.assertEqual(response.status_code, 401, 'Should not allow other users to modify others details')
+        self.assertEqual(models.User.objects.get(username='johnsmith').first_name, 'John', 'Should not allow other users to modify others details')
+
+    def test_post_super(self):
+        user = models.User.objects.get(username='joeblogs')
+        user.authority = True
+        user.save()
+
+        self.client.login(username='joeblogs', password='abcdefghi123')
+        response = self.client.post(self.path, data={
+            'username': 'johnsmith',
+            'first_name': 'Super'
+        })
+        self.assertNotEqual(response.status_code, 401, 'Should allow superuser modification')
+        self.assertTrue(300 < response.status_code < 304, 'Should redirect')
+        self.assertEqual(response['Location'], '/', 'Should redirect to home')
+
+        john = models.User.objects.get(username='johnsmith')
+        self.assertEqual(john.first_name, 'Super', 'Should allow superuser modification')
+        john.first_name = 'John'
+        john.save()
+        user.authority = False
+        user.save()
+
+    def test_post_new(self):
+        data = {
+            'username': 'username',
+            'password': 'superPass',
+            'first_name': 'firstname',
+            'last_name': 'lastname',
+            'email': 'test@test.com',
+        }
+        response = self.client.post(self.path, data=data)
+        self.assertTrue(300 < response.status_code < 304, 'Should redirect')
+        self.assertEqual(response['Location'], '/', 'Should redirect to home')
+        del data['password']
+        user = models.User.objects.get(username='username')
+        self.assertTrue(set(data.items()).issubset(user.to_dict().items()),
+                        'Failed to create correct user: ' + str(set(data.items()) - set(user.to_dict().items())))
+
+    def test_post_new_invalid(self):
+        data = {
+            'username': 'username',
+            'password': 'superPass',
+            'last_name': 'lastname',
+            'email': 'test@test.com',
+        }
+        response = self.client.post(self.path, data=data)
+        self.assertEqual(response.status_code, 400, 'Should fail on invalid request')
