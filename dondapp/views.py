@@ -95,8 +95,8 @@ class DealView(Resource):
         context = {
             'deal': deal,
             'comments': models.Comment.objects.filter(deal_id=id),
-            'upvoters': deal.upvoters.values_list('username', flat=True),
-            'downvoters': deal.downvoters.values_list('username', flat=True)
+            'upvoted': deal.upvoters.filter(username=request.user.username).exists(),
+            'downvoted': deal.downvoters.filter(username=request.user.username).exists()
         }
         return render(request, 'dondapp/deal.html', context=context)
 
@@ -348,7 +348,7 @@ class VoteView(Resource):
         data = json.loads(request.body)
         if 'deal_id' not in data:
             return HttpResponseBadRequest('Deal ID not specified')
-        if 'upvote' not in date:
+        if 'upvote' not in data:
             return HttpResponseBadRequest('Upvote not specified')
         try:
             deal = models.Deal.objects.get(id=data['deal_id'])
