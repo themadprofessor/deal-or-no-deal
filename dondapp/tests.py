@@ -287,3 +287,42 @@ class CommentViewTest(BaseTestCases.ResourceTestCase):
         self.assertEqual(response.status_code, 403)
         comment.delete()
         self.client.logout()
+
+
+class UserView(BaseTestCases.ResourceTestCase):
+    path = '/user/'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        models.User.objects.create_user("johnsmith", "John", "Smith", "john@smith.com", "abcdefghi123")
+        models.User.objects.create_user("joeblogs", "Joe", "Blogs", "joe@blogs.com", "abcdefghi123")
+
+    @classmethod
+    def tearDownClass(cls):
+        for user in models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')):
+            user.delete()
+        super().tearDownClass()
+
+    def get_profile(self):
+        response = self.client.get(self.path + 'johnsmith/')
+        self.assertContains(response, 'john@smith.com', 'Profile page should show the email of a user')
+        self.assertNotContains(response, 'abcdefghi123', ' Profile page should not show passwords')
+
+    def get_fake_profile(self):
+        response = self.client.get(self.path + 'NOTREAL/')
+        self.assertEqual(response.status_code, 404, 'Should fail to find user')
+
+    def get_none(self):
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 404, 'Should fail to find user')
+
+    def get_fake(self):
+        response = self.client.get(self.path, data={'username': 'NOTREAL'})
+        self.assertEqual(response.status_code, 404, 'Should fail to find user')
+
+    def get(self):
+        response = self.client.get(self.path, data={'username': 'johnsmith'})
+        json = response.json()
+        self.assertEqual(json['email'], 'john@smith.com', 'Failed to get correct user json')
+        self.assertTrue('password' not in json)

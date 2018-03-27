@@ -14,6 +14,8 @@ from .router import Resource, auth_required
 
 
 def render(request, *args, **kwargs):
+    """Wrapper for django's render function which ensures there is a list of categories in the context if the user is
+    logged in"""
     if request.user.is_authenticated:
         context = kwargs.get('context', {})
         if 'categories' not in context:
@@ -26,6 +28,11 @@ class HomeView(Resource):
     """View for handling index/home requests"""
 
     def get(self, request):
+        """
+        Returns the home page
+        :param request: HTTP GET Request
+        :return: returns the home page
+        """
         return render(request, 'dondapp/home.html')
 
 
@@ -33,16 +40,33 @@ class AboutView(Resource):
     """View for handling about requests"""
 
     def get(self, request):
+        """
+        Returns the about page
+        :param request: HTTP GET Request
+        :return: returns the about page
+        """
         return render(request, 'dondapp/about.html')
 
 
 class FailedView(Resource):
+    """View for handling failed credential requests"""
     def get(self, request):
+        """
+        Returns the failed credentials page
+        :param request: HTTP GET Request
+        :return: returns the failed credentials page
+        """
         return render(request, 'dondapp/failed.html')
 
 
 class SearchView(Resource):
+    """View for handling search queries"""
     def get(self, request):
+        """Searches for deals which match the given query
+        :param request: HTTP GET Request
+        :return Returns HttpResponseBadRequest if there is no query in the GET data, otherwise returns the search page
+        with all deals which match the query.
+        """
         if 'query' not in request.GET:
             return HttpResponseBadRequest("No query given")
         query = request.GET['query']
@@ -56,7 +80,14 @@ class SearchView(Resource):
 
 
 class DealView(Resource):
+    """View for creating and viewing deals"""
     def get(self, request, id=None):
+        """
+        View a deal's page.
+        :param request: HTTP GET Request
+        :param id: ID of deal to view.
+        :return: Returns HttpResponse(404) if there is no deal with the given ID, otherwise return the deal's page.
+        """
         try:
             deal = models.Deal.objects.get(id=id)
         except models.Deal.DoesNotExist:
@@ -70,7 +101,12 @@ class DealView(Resource):
         return render(request, 'dondapp/deal.html', context=context)
 
     def post(self, request):
-        print(request.POST)
+        """
+        Create a new deal with the POST data in the given request.
+        :param request: HTTP POST Request
+        :return: Returns HttpResponseBadRequest if an attribute required to create deal is missing from the POST data,
+        HttpResponse(404) if either the user_id or category_id don't exist, otherwise returns HttpResponse(200).
+        """
         for required in models.Deal.REQUIRED:
             if required not in request.POST:
                 return HttpResponseBadRequest(required + ' not specified')
@@ -89,7 +125,13 @@ class DealView(Resource):
 
 
 class NewDealView(Resource):
+    """View for getting all deals sorted by creation date"""
     def get(self, request):
+        """
+        Get all deals sorted by number of creation date.
+        :param request: HTTP GET Request
+        :return: Returns HttpResponse(200) with a JSON encoded list of all deals sorted by creation date.
+        """
         deals = models.Deal.objects.all()
         data = []
         for deal in deals:
@@ -99,7 +141,13 @@ class NewDealView(Resource):
         
         
 class TopDealView(Resource):
+    """View for getting all deals sorted by number of upvotes"""
     def get(self, request):
+        """
+        Get all deals sorted by number of upvotes.
+        :param request: HTTP GET Request
+        :return: Returns HttpResponse(200) with a JSON encoded list of all deals sorted by upvotes.
+        """
         deals = models.Deal.objects.all()
         data = []
         for deal in deals:
@@ -109,14 +157,31 @@ class TopDealView(Resource):
 
 
 class CommentView(Resource):
+    """View for creating, viewing and deleting comments"""
+
     def get(self, request):
+        """
+        Returns the JSON encoded form of the comment with the ID specified in the GET request's data.
+        :param request: HTTP GET Request
+        :return: Returns HttpResponseBadRequest if no ID is specifed in the GET data, HttpResponse(404) if there is no
+        comment with the given ID, otherwise returns HttpResponse(200) with the JSON encoded comment.
+        """
         if 'id' not in request.GET:
             return HttpResponseBadRequest("No id given")
-        comment = models.Comment.objects.get(id=request.GET['id'])
+        try:
+            comment = models.Comment.objects.get(id=request.GET['id'])
+        except models.Comment.DoesNotExist:
+            return HttpResponse('Comment not found', status=404)
         return HttpResponse(comment.to_json(), status=200, content_type='application/json')
 
     @auth_required
     def post(self, request):
+        """
+        Creates a new comment with the given request's POST data.
+        :param request: HTTP POST Request
+        :return: Returns HttpResponseBadRequest if the POST data is missing any attributes required to create a comment,
+        HttpResponse(404) if the deal specifed in the POST data doesn't exist, otherwise returns HttpResponse(200)
+        """
         for required in models.Comment.REQUIRED:
             if required not in request.POST:
                 return HttpResponseBadRequest(required + " not specified")
@@ -132,6 +197,14 @@ class CommentView(Resource):
 
     @auth_required
     def delete(self, request, id):
+        """
+        Deletes the comment with the given ID.
+        :param request: HTTP DELETE Request
+        :param id: ID of comment to be deleted
+        :return: Returns HttpResponse(404) if there is no comment with the given ID, HttpResponseForbidden if the
+        user logged in in the request is not the author of the comment and the currently logged in user is not a
+        superuser, otherwise returns HttpResponse(200)
+        """
         try:
             comment = models.Comment.objects.get(id=id)
         except models.Comment.DoesNotExist:
@@ -145,9 +218,24 @@ class CommentView(Resource):
 
 
 class UserView(Resource):
+    """View for handling user creation, modification, JSON and profiles"""
+
     def get(self, request, username=None):
+        """
+        If username if valid, get the corresponding user's profile page. Otherwise, extract the username from the
+        request's GET data and return the corresponding user's information as JSON.
+        :param request: HTTP GET Request
+        :param username: Username of user who's profile is required
+        :return: If username is given, returns HttpResponse(404) if there is no user with said username, or the
+        corresponding user's profile page. If the username if not given, returns HttpResponseBadRequest if there is no
+        username in the request's GET data, HttpResponse(404) if there is no user with the username in the GET data,
+        otherwise returns HttpResponse(200) with the corresponding user's details as JSON.
+        """
         if username:
-            user = models.User.objects.get(username=username)
+            try:
+                user = models.User.objects.get(username=username)
+            except models.User.DoesNotExist:
+                return HttpResponse('User does not exist', status=404)
             context = {
                 'user': user,
                 'deals': models.Deal.objects.filter(user_id=user)
@@ -164,6 +252,16 @@ class UserView(Resource):
             return HttpResponse(user.to_json(), status=200)
 
     def post(self, request):
+        """
+        If the username in the given POST request's data is known, modify the corresponding user's details based on the
+        POST data, otherwise create a new user with the POST data.
+        :param request: HTTP POST Request
+        :return: If no user name is in the POST data, returns HttpResponseBadRequest. If the given username already
+        exits, returns HttpResponse(401) if the user is not logged in, HttpRequestForbidden if the current user is not
+        the user to be modified and is not a superuser, if password is specifed in the POST data the user will be logged
+        out, otherwise redirect to the home page. If the username doesn't already exist, returns HttpResponseBadRequest
+        if any attribute required to create a user is missing or the username is taken, otherwise logs the new user in.
+        """
         if 'username' in request.POST:
             if models.User.objects.filter(username=request.POST['username']).exists():
                 if not request.user.is_authenticated:
@@ -201,12 +299,21 @@ class UserView(Resource):
                 user.save()
                 # Log the user in after they register
                 return LoginView().post(request)
+        else:
+            return HttpResponseBadRequest("No username specified")
 
 
 class LoginView(Resource):
     """View for handling login requests"""
 
     def post(self, request):
+        """
+        Using the username and password from the given request's POST data, logs the corresponding user in.
+        :param request: HTTP POST Request
+        :return: Returns HttpResponseBadRequest if the POST data doesn't contain either a username or password. If the
+        credentials successfully login, returns a redirect to the home page, otherwise returns a redirect to the failed
+        page
+        """
         if "username" not in request.POST:
             return HttpResponseBadRequest("No username given")
         if "password" not in request.POST:
@@ -223,6 +330,7 @@ class LoginView(Resource):
 
     @auth_required
     def delete(self, request):
+        """Logout the user in the given given request"""
         return logout(request)
 
 
