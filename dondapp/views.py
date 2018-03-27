@@ -341,13 +341,19 @@ class VoteView(Resource):
         """
         Adds an upvote or downvote to the deal in the request
         :param request: HTTP POST request
-        :exception Throws Http404 if the given deal doesn't exist
-        :return: Returns HttpReponseBadRequest if either no deal or vote is specified. Returns HttpResponse with HTTP
-        OK status if the deal's votes are successfully modified
+        :return: Returns HttpReponseBadRequest if either no deal or vote is specified, HttpResponse(404) if the deal
+        does not exists returns HttpResponse with HTTP OK status if the deal's votes are successfully modified
         """
 
         data = json.loads(request.body)
-        deal = get_object_or_404(models.Deal, id=data['deal_id'])
+        if 'deal_id' not in data:
+            return HttpResponseBadRequest('Deal ID not specified')
+        if 'upvote' not in date:
+            return HttpResponseBadRequest('Upvote not specified')
+        try:
+            deal = models.Deal.objects.get(id=data['deal_id'])
+        except models.Deal.DoesNotExist:
+            return HttpResponse('Deal not found', status=404)
         if data['upvote']:
             deal.upvotes += 1
             deal.upvoters.add(request.user)
@@ -362,9 +368,8 @@ class VoteView(Resource):
         """
         Returns the upvote and downvote values of the deal specified in the given request
         :param request: HTTP Get request
-        :exception Throws Http404 if the given deal doesn't exist
-        :return: Returns HttpResponseBadRequest if no deal is specified or HttpResponse with HTTP OK status and the
-        following JSON body:
+        :return: Returns HttpResponseBadRequest if no deal is specified, HttpResponse(404) if the deal is not found or
+        HttpResponse with HTTP OK status and the following JSON body:
         {
             'upvotes': upvotes as int,
             'downvotes': downvotes as int
@@ -374,9 +379,14 @@ class VoteView(Resource):
         if "deal_id" not in request.GET:
             return HttpResponseBadRequest("No deal specified")
         deal_id = request.GET["deal_id"]
-        deal = get_object_or_404(models.Deal, id=deal_id)
+        try:
+            deal = models.Deal.objects.get(id=deal_id)
+        except models.Deal.DoesNotExist:
+            return HttpResponse('Deal not found', status=404)
         response_data = {
             'upvotes': deal.upvotes,
-            'downvotes': deal.downvotes
+            'downvotes': deal.downvotes,
+            'upvoters': list(deal.downvoters.values_list('username', flat=True)[:]),
+            'downvoters': list(deal.downvoters.values_list('username', flat=True)[:]),
         }
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

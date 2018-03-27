@@ -1,5 +1,6 @@
 import datetime
 import pytz
+import json as JSON
 from django.db.models import Q
 
 from dondapp import models
@@ -11,10 +12,6 @@ from django.test import TestCase
 class BaseTestCases:
     class ResourceTestCase(TestCase):
         """Base test case for resources. Subclasses should overwrite methods which are supported by the endpoint"""
-
-        @classmethod
-        def setUpClass(cls):
-            super().setUpClass()
 
         def test_get(self):
             response = self.client.get(self.path)
@@ -104,12 +101,9 @@ class SearchView(BaseTestCases.ResourceTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        for deal in models.Deal.objects.filter(Q(title__contains='McDonalds') | Q(title__contains='KFC')):
-            deal.delete()
-        for category in models.Category.objects.filter(name='Food'):
-            category.delete()
-        for user in models.User.objects.filter(username='johnsmith'):
-            user.delete()
+        models.Deal.objects.filter(Q(title__contains='McDonalds') | Q(title__contains='KFC')).delete()
+        models.Category.objects.filter(name='Food').delete()
+        models.User.objects.filter(username='johnsmith').delete()
         super().tearDownClass()
 
 
@@ -132,12 +126,9 @@ class DealViewTest(BaseTestCases.ResourceTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        for deal in models.Deal.objects.filter(Q(title='McDonalds Deal') | Q(title='KFC')):
-            deal.delete()
-        for category in models.Category.objects.filter(name='Food'):
-            category.delete()
-        for user in models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')):
-            user.delete()
+        models.Deal.objects.filter(Q(title='McDonalds Deal') | Q(title='KFC')).delete()
+        models.Category.objects.filter(name='Food').delete()
+        models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')).delete()
         super().tearDownClass()
 
     def test_get_empty(self):
@@ -226,14 +217,10 @@ class CommentViewTest(BaseTestCases.ResourceTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        for comment in models.Comment.objects.filter(content__contains='M8'):
-            comment.delete()
-        for deal in models.Deal.objects.filter(title='McDonalds Deal'):
-            deal.delete()
-        for category in models.Category.objects.filter(name='Food'):
-            category.delete()
-        for user in models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')):
-            user.delete()
+        models.Comment.objects.filter(content__contains='M8').delete()
+        models.Deal.objects.filter(title='McDonalds Deal').delete()
+        models.Category.objects.filter(name='Food').delete()
+        models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')).delete()
         super().tearDownClass()
 
     def test_get_none(self):
@@ -273,7 +260,8 @@ class CommentViewTest(BaseTestCases.ResourceTestCase):
     def test_delete(self):
         comment = models.Comment.objects.create(deal_id=models.Deal.objects.get(id=1),
                                                 user_id=models.User.objects.get(username='joeblogs'),
-                                                content='Best dealo', creation_date=pytz.utc.localize(datetime.datetime.now()))
+                                                content='Best dealo',
+                                                creation_date=pytz.utc.localize(datetime.datetime.now()))
         self.client.login(username='joeblogs', password='abcdefghi123')
         response = self.client.delete(self.path + str(comment.id) + '/')
         self.assertEqual(response.status_code, 200)
@@ -283,7 +271,8 @@ class CommentViewTest(BaseTestCases.ResourceTestCase):
     def test_delete_forbid(self):
         comment = models.Comment.objects.create(deal_id=models.Deal.objects.get(id=1),
                                                 user_id=models.User.objects.get(username='johnsmith'),
-                                                content='Best dealo', creation_date=pytz.utc.localize(datetime.datetime.now()))
+                                                content='Best dealo',
+                                                creation_date=pytz.utc.localize(datetime.datetime.now()))
         self.client.login(username='joeblogs', password='abcdefghi123')
         response = self.client.delete(self.path + str(comment.id) + '/')
         self.assertEqual(response.status_code, 403)
@@ -302,8 +291,7 @@ class UserView(BaseTestCases.ResourceTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        for user in models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')):
-            user.delete()
+        models.User.objects.filter(Q(username='johnsmith') | Q(username='joeblogs')).delete()
         super().tearDownClass()
 
     def test_get_profile(self):
@@ -353,7 +341,8 @@ class UserView(BaseTestCases.ResourceTestCase):
             'first_name': 'Super'
         })
         self.assertEqual(response.status_code, 401, 'Should not allow unauthenticated users')
-        self.assertEqual(models.User.objects.get(username='johnsmith').first_name, 'John', 'Should not modify if unauthenticated')
+        self.assertEqual(models.User.objects.get(username='johnsmith').first_name, 'John',
+                         'Should not modify if unauthenticated')
 
     def test_post_forbid(self):
         self.client.login(username='joeblogs', password='abcdefhi123')
@@ -362,7 +351,8 @@ class UserView(BaseTestCases.ResourceTestCase):
             'first_name': 'Super'
         })
         self.assertEqual(response.status_code, 401, 'Should not allow other users to modify others details')
-        self.assertEqual(models.User.objects.get(username='johnsmith').first_name, 'John', 'Should not allow other users to modify others details')
+        self.assertEqual(models.User.objects.get(username='johnsmith').first_name, 'John',
+                         'Should not allow other users to modify others details')
 
     def test_post_super(self):
         user = models.User.objects.get(username='joeblogs')
@@ -441,7 +431,7 @@ class LoginViewTest(BaseTestCases.ResourceTestCase):
         })
         self.assertTrue(300 < response.status_code < 304, 'Should redirect')
         self.assertEqual(response['Location'], '/', 'Should redirect to home')
-        self.assertTrue(response.request.user.is_authenticated, 'Failed to log user in')
+        self.assertTrue(models.User.objects.get(username='johnsmith').is_authenticated, 'Failed to log user in')
         self.client.logout()
 
     def test_post_bad(self):
@@ -457,4 +447,68 @@ class LoginViewTest(BaseTestCases.ResourceTestCase):
         })
         self.assertTrue(300 < response.status_code < 304, 'Should redirect')
         self.assertEqual(response['Location'], '/failed/', 'Should redirect to failed')
-        self.assertFalse(response.request.user.is_authenticated, 'User should not be logged in on failed login')
+
+
+class VoteViewTest(BaseTestCases.ResourceTestCase):
+    path = '/vote/'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        user = models.User.objects.create_user("johnsmith", "John", "Smith", "john@smith.com", "abcdefghi123")
+        category = models.Category.objects.create(name="Food", description="Food based deals")
+        mc_deal = models.Deal.objects.create(category_id=category, user_id=user, title="McDonalds Deal",
+                                             description="Free Cheeseburger with saver meal", price=0.0, upvotes=10,
+                                             downvotes=5)
+
+    @classmethod
+    def tearDownClass(cls):
+        models.Deal.objects.filter(title='McDonalds Deal').delete()
+        models.Category.objects.filter(name='Food').delete()
+        models.User.objects.get(username='johnsmith').delete()
+        super().tearDownClass()
+
+    def test_get(self):
+        deal = models.Deal.objects.filter(title='McDonalds Deal')[0]
+        response = self.client.get(self.path, data={'deal_id': deal.id})
+        json = response.json()
+        self.assertEqual(list(json.items()), [('upvotes', 10), ('downvotes', 5), ('upvoters', []), ('downvoters', [])],
+                         'Should only return upvote and downvote counts')
+
+    def test_get_bad(self):
+        response = self.client.get(self.path, data={'deal_id': -999})
+        self.assertEqual(response.status_code, 404, 'Should not allow unknown deals')
+
+    def test_get_missing(self):
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, 400, 'Should not allow invalid requests')
+
+    def test_post(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        deal = models.Deal.objects.filter(title='McDonalds Deal')[0]
+        response = self.client.post(self.path, JSON.dumps({"deal_id": deal.id, "upvote": True}), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        deal.refresh_from_db()
+        self.assertEqual(deal.upvotes, 11, 'Failed to change upvotes')
+        self.assertTrue(deal.upvoters.filter(username='johnsmith'), 'Failed to add upvoter')
+        self.client.logout()
+
+    def test_post_down(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        deal = models.Deal.objects.filter(title='McDonalds Deal')[0]
+        response = self.client.post(self.path, JSON.dumps({"deal_id": deal.id, "upvote": False}), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        deal.refresh_from_db()
+        self.assertEqual(deal.downvotes, 6, 'Failed to change downvotes')
+        self.assertTrue(deal.downvoters.filter(username='johnsmith'), 'Failed to add downvoter')
+        self.client.logout()
+
+    def test_post_invalid(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        response = self.client.post(self.path, JSON.dumps({"upvote": False}), content_type='application/json')
+        self.assertEqual(response.status_code, 400, 'Should not allow invalid requests')
+
+    def test_post_missing(self):
+        self.client.login(username='johnsmith', password='abcdefghi123')
+        response = self.client.post(self.path, JSON.dumps({'deal_id': -1, "upvote": False}), content_type='application/json')
+        self.assertEqual(response.status_code, 404, 'Should not allow unknown deals')
