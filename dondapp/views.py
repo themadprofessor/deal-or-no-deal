@@ -348,7 +348,7 @@ class VoteView(Resource):
         data = json.loads(request.body)
         if 'deal_id' not in data:
             return HttpResponseBadRequest('Deal ID not specified')
-        if 'upvote' not in date:
+        if 'upvote' not in data:
             return HttpResponseBadRequest('Upvote not specified')
         try:
             deal = models.Deal.objects.get(id=data['deal_id'])
