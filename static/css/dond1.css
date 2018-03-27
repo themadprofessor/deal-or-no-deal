@@ -185,7 +185,7 @@ span.psw {
 }
 
 
-/* css for the deal cards (category view)*/
+/* css for the deal cards (category view) */
 
 .card {
     margin-top: 1em;
@@ -203,6 +203,7 @@ span.psw {
     background-color: #ff3a3a;
 }
 
+
 /* css for the deal cards (deal view) */
 
 .deal_price {
@@ -213,7 +214,16 @@ span.psw {
 .deal_image {
     display: block;
     margin: 0 auto;
-    
+}
+
+/* css for the profile page */
+
+h5 {
+    font-size: 28px;
+}
+
+.profile_page p {
+    font-size: 20px;
 }
 
 /* css for the comment and register model */
@@ -307,3 +317,7 @@ span.psw {
     border: 1px solid #ccc;
     box-sizing: border-box;
 }
+
+/* css for smaller screen sizes */
+
+

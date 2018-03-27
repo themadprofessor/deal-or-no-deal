@@ -8,10 +8,10 @@ Profile - {{ user.username }}
 {% block body_block %}
     <div class="container">
         <div class="card">
-            <div class="card-body">
+            <div class="card-body profile_page">
                 <h5>{{ user.username }}</h5>
-                <p>{{ user.email }}</p>
-                <p>{{ user.first_name }} {{ user.last_name }}</p>
+                <p>Email Address: {{ user.email }}</p>
+                <p>Name: {{ user.first_name }} {{ user.last_name }}</p>
                 <p>{{ user.likes }} <i class="fas fa-thumbs-up"></i></p>
             </div>
         </div>
@@ -23,10 +23,10 @@ Profile - {{ user.username }}
                             <p style="float: none; margin: 0 auto">{{ deal.upvotes }}</p>
                         </div>
                         <div class="row align-items-center">
-                            <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-up"></i></button>
+                            <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light up_vote"><i class="fas fa-chevron-up"></i></button>
                         </div>
                         <div class="row align-items-center">
-                            <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light"><i class="fas fa-chevron-down"></i></button>
+                            <button style="float: none; margin: 0 auto" class="vote_buttons btn btn-light down_vote"><i class="fas fa-chevron-down"></i></button>
                         </div>
                         <div class="row align-items-center">
                             <p style="float: none; margin: 0 auto">{{ deal.downvotes }}</p>
