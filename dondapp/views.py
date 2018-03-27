@@ -94,6 +94,7 @@ class DealView(Resource):
             return HttpResponse('Deal not found', status=404)
         context = {
             'deal': deal,
+            'price': "%.2f" % deal.price,
             'comments': models.Comment.objects.filter(deal_id=id),
             'upvoted': deal.upvoters.filter(username=request.user.username).exists(),
             'downvoted': deal.downvoters.filter(username=request.user.username).exists()
