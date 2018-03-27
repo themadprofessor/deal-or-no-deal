@@ -203,6 +203,19 @@ span.psw {
     background-color: #ff3a3a;
 }
 
+.vote_buttons.btn.btn-light {
+    float: none;
+    margin: 0 auto;
+}
+
+.upvoted {
+    background: #4CAF50;
+}
+
+.downvoted {
+    background: #ff3a3a;
+}
+
 /* css for the deal cards (deal view) */
 
 .deal_price {
