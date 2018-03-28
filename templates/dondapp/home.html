@@ -11,7 +11,7 @@
 		<button class="filters" id="top" onclick="get_deals('top')">Top</li>
 	</ul>
 
-    <div id='deals' class="container">
+    <div id='deals' class="container-fluid">
     	<ul id='deal_list'>
     	</ul>
     </div>
@@ -37,7 +37,7 @@
                     var card_body = $('<div>', {'class': 'card_body'});
                     var row = $('<div>', {'class': 'row'});
                     var vote_col = $('<div>', {'class': 'col-sm-1'});
-                    var info_col = $('<div>', {'class': 'col'});
+                    var info_col = $('<div>', {'class': 'col-sm-10'});
                     var title_row = $('<div>', {'class': 'row'});
                     var desc_row = $('<div>', {'class': 'row'});
                     var up_count = $('<p>', {
