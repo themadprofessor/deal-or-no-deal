@@ -116,7 +116,7 @@
             <div class="container">
                 <button type="button" class="cancelbtn" style="background-color:#ff3a3a; width:100%" onclick="close_register()">Cancel</button>
             </div>
-            <div id="register-alert" class="alert alert-danger" role="alert">
+            <div id="register-alert" class="alert alert-danger collapse" role="alert">
 
             </div>
         </form>
@@ -223,6 +223,7 @@
             }).fail(function () {
                 form.submit();
             }).done(function () {
+                $('#register-alert').show();
                 const alert = $('#register-alert');
                 alert.html('Username is taken');
                 alert.alert();

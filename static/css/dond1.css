@@ -231,6 +231,7 @@ span.psw {
     margin: 0 auto;
 }
 
+
 /* css for the profile page */
 
 h5 {
@@ -240,6 +241,7 @@ h5 {
 .profile_page p {
     font-size: 20px;
 }
+
 
 /* css for the comment and register model */
 
@@ -300,6 +302,10 @@ h5 {
     width: 100%;
 }
 
+#register-model button:hover{
+    opacity: 0.75;
+}
+
 #deal-model input[type=text] {
     width: 100%;
     padding: 12px 20px;
@@ -331,4 +337,11 @@ h5 {
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
+}
+
+/* css for invalid login page */
+
+.invalid-login {
+    margin-top: 1em;
+    background-color: white;
 }
