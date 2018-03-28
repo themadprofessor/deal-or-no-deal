@@ -8,7 +8,7 @@
 ### Automatic Setup
 
 Run either `setup.bat` or `setup.sh` to setup environment and database. The scripts create a virtual environment with 
-the name `venv`.
+the name `venv`, which must be activated manually before the server is started. 
 
 ### Manual Setup
 
