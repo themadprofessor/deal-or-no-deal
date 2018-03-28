@@ -1,8 +1,8 @@
 @echo off
-python -m venv venv
+python3 -m venv venv
 venv\Scripts\activate.bat
 pip install -r requirements.txt
-python manage.py makemigrations dondapp
-python manage.py makemigrations
-python manage.py migrate
-python populate_script.py
+python3 manage.py makemigrations dondapp
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 populate_script.py
