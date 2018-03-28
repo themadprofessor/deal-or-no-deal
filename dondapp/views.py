@@ -344,25 +344,58 @@ class VoteView(Resource):
         :return: Returns HttpReponseBadRequest if either no deal or vote is specified, HttpResponse(404) if the deal
         does not exists returns HttpResponse with HTTP OK status if the deal's votes are successfully modified
         """
+        user = request.user
 
-        data = json.loads(request.body)
-        if 'deal_id' not in data:
-            return HttpResponseBadRequest('Deal ID not specified')
-        if 'upvote' not in data:
-            return HttpResponseBadRequest('Upvote not specified')
-        try:
-            deal = models.Deal.objects.get(id=data['deal_id'])
-        except models.Deal.DoesNotExist:
-            return HttpResponse('Deal not found', status=404)
-        if data['upvote']:
-            deal.upvotes += 1
-            deal.upvoters.add(request.user)
+
+        if user.is_authenticated:
+            data = json.loads(request.body)
+            if 'deal_id' not in data:
+                return HttpResponseBadRequest('Deal ID not specified')
+            if 'upvote' not in data:
+                return HttpResponseBadRequest('Upvote not specified')
+            try:
+                deal = models.Deal.objects.get(id=data['deal_id'])
+            except models.Deal.DoesNotExist:
+                return HttpResponse('Deal not found', status=404)
+
+            dealUpVotes = deal.upvoters.all()
+            dealDownVotes = deal.downvoters.all()
+
+            if data['upvote']:
+                if user in dealUpVotes:
+                    #user has upvoted before, do nothing
+                    pass
+                else:
+                    deal.upvotes += 1
+                    deal.upvoters.add(user)
+
+                    if request.user in dealDownVotes:
+                        #they have downvoted prior to upvoting so remove a downvote
+                        #plus remove their name off of the list
+                        deal.downvotes -= 1 
+                        deal.downvoters.remove(request.user) 
+            else:
+                ##so downvote
+                if request.user in dealDownVotes:
+                    #the user has already downvoted so do nothing
+                    pass
+                else:
+
+                    deal.downvotes += 1
+                    deal.downvoters.add(request.user)
+                    if request.user in dealUpVotes:
+                        #they have upvoted prior to downvoting so remove a downvote
+                        #plus remove their name off of the list
+                        deal.upvotes -= 1 
+                        deal.upvoters.remove(request.user) 
+
+            deal.save()
+            return HttpResponse(status=200)
         else:
-            deal.downvotes += 1
-            deal.downvoters.add(request.user)
+            return HttpResponse('not logged in', status=404)
 
-        deal.save()
-        return HttpResponse(status=200)
+
+
 
     def get(self, request):
         """
