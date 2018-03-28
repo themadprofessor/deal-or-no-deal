@@ -113,11 +113,14 @@ button:focus{
 
 h1 {
 	text-align: center;
+    font-size: 42px;
 }
 
 .about-text {
-	font-size: 18px;
+	font-size: 24px;
 	text-align: center;
+    background-color: white;
+    margin-top: 1em;
 }
 
 
@@ -329,7 +332,3 @@ h5 {
     border: 1px solid #ccc;
     box-sizing: border-box;
 }
-
-/* css for smaller screen sizes */
-
-
